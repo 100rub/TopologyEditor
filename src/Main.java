@@ -43,6 +43,16 @@ public class Main
         c = (Contact)list.get(0);
         handler.Do(moveAction, new PointTargetedActionParameters(c, new PrecisePoint(1, 1)));
 
+        try
+        {
+            handler.Undo();
+            handler.Redo();
+        }
+        catch (Exception e)
+        {
+
+        }
+
         MainForm mainForm = new MainForm();
     }
 }

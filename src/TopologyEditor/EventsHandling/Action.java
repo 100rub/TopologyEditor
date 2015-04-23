@@ -5,14 +5,14 @@ package TopologyEditor.EventsHandling;
  */
 public abstract class Action
 {
-    protected final ActionInfo ApplyMain(ActionParameters parameters)
+    protected final ActionInfo Apply(ActionParameters parameters)
     {
-        ActionInfo info = Apply(parameters);
+        ActionInfo info = ApplyMain(parameters);
         info.setAction(this);
         return info;
     }
 
 
 
-    public abstract ActionInfo Apply(ActionParameters parameters);
+    protected abstract ActionInfo ApplyMain(ActionParameters parameters);
 }

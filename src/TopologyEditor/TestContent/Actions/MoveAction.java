@@ -13,7 +13,7 @@ import TopologyEditor.PrecisePoint;
 public class MoveAction extends Action
 {
     @Override
-    public ActionInfo Apply(ActionParameters parameters)
+    public ActionInfo ApplyMain(ActionParameters parameters)
     {
         if (!PointTargetedActionParameters.class.isInstance(parameters))
             throw new IllegalArgumentException("MoveAction accepts only PointTargetedActionParameters as parameters");
