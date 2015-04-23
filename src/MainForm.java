@@ -1,3 +1,6 @@
+import TopEd.PrecisePoint;
+import TopEd.VirtualPane;
+
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
