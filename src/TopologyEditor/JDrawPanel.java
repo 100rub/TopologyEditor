@@ -1,4 +1,4 @@
-package TopEd;
+package TopologyEditor;
 
 import javax.swing.*;
 import java.awt.*;

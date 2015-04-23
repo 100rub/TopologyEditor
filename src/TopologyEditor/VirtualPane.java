@@ -1,6 +1,4 @@
-package TopEd;
-
-import TopEd.PrecisePoint;
+package TopologyEditor;
 
 import java.util.List;
 

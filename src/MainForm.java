@@ -1,5 +1,5 @@
-import TopEd.PrecisePoint;
-import TopEd.VirtualPane;
+import TopologyEditor.PrecisePoint;
+import TopologyEditor.VirtualPane;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -50,8 +50,8 @@ public class MainForm extends JFrame
                 {
                     mousePosition = new PrecisePoint();
                 }
-                mousePosition.x = e.getX();
-                mousePosition.y = e.getY();
+                mousePosition.setX(e.getX());
+                mousePosition.setY(e.getY());
             }
             public void mouseReleased(MouseEvent e)
             {
@@ -64,17 +64,17 @@ public class MainForm extends JFrame
             public void mouseDragged(MouseEvent e)
             {
                 //System.out.println("mouseDragged");
-                double dx = e.getX() - mousePosition.x;
-                double dy = e.getY() - mousePosition.y;
-                CurrentPane.ViewPoint.x -= dx;
-                CurrentPane.ViewPoint.y -= dy;
+                double dx = e.getX() - mousePosition.getX();
+                double dy = e.getY() - mousePosition.getY();
+                CurrentPane.ViewPoint.setX(CurrentPane.ViewPoint.getX() - dx);
+                CurrentPane.ViewPoint.setY(CurrentPane.ViewPoint.getY() - dy);
 
                 System.out.println("mouseDragged dx=" + dx + " dy=" + dy);
 
                 RedrawPane();
 
-                mousePosition.x = e.getX();
-                mousePosition.y = e.getY();
+                mousePosition.setX(e.getX());
+                mousePosition.setY(e.getY());
             }
 
             public void mouseMoved(MouseEvent e)
