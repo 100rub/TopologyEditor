@@ -8,6 +8,39 @@ import java.awt.*;
  */
 public class JDrawPanel extends JPanel
 {
+    private VirtualPane AssignedPane;
+
+    public JDrawPanel()
+    {
+        AssignedPane = null;
+    }
+
+
+
+    public JDrawPanel(VirtualPane pane)
+    {
+        AssignedPane = pane;
+    }
+
+
+
+    public void assignPane(VirtualPane pane)
+    {
+        if(AssignedPane != null)
+        {
+            //TODO free memory
+        }
+
+        AssignedPane = pane;
+    }
+
+
+
+    public VirtualPane getPane()
+    {
+        return AssignedPane;
+    }
+
 
 
     public void paint(Graphics g)
