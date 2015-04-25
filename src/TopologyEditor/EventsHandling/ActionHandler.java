@@ -27,20 +27,22 @@ public final class ActionHandler
         _undoes.clear();
     }
 
-    public void Undo() throws Exception
+    public boolean Undo()
     {
         if (_actions.isEmpty())
-            throw new Exception("Nothing to undo");
+            return false;
         ActionInfo info = _actions.poll();
         _undoes.add(info.getOpposite().Apply(info.getParameters()));
+        return true;
     }
 
-    public void Redo() throws Exception
+    public boolean Redo()
     {
         if (_undoes.isEmpty())
-            throw new Exception("Nothing to redo");
+            return false;
         ActionInfo info = _undoes.poll();
         _actions.add(info.getOpposite().Apply(info.getParameters()));
+        return true;
     }
 
     public Iterable<ActionInfo> getActions()

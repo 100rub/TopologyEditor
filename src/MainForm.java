@@ -66,8 +66,8 @@ public class MainForm extends JFrame
                 //System.out.println("mouseDragged");
                 double dx = e.getX() - mousePosition.getX();
                 double dy = e.getY() - mousePosition.getY();
-                CurrentPane.ViewPoint.setX(CurrentPane.ViewPoint.getX() - dx);
-                CurrentPane.ViewPoint.setY(CurrentPane.ViewPoint.getY() - dy);
+                CurrentPane.getViewPoint().setX(CurrentPane.getViewPoint().getX() - dx);
+                CurrentPane.getViewPoint().setY(CurrentPane.getViewPoint().getY() - dy);
 
                 System.out.println("mouseDragged dx=" + dx + " dy=" + dy);
 

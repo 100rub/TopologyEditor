@@ -4,8 +4,9 @@ import TopologyEditor.EventsHandling.PointTargetedActionParameters;
 import TopologyEditor.TestContent.Actions.MoveAction;
 import TopologyEditor.TestContent.Elements.Contact;
 import TopologyEditor.PrecisePoint;
+import TopologyEditor.VirtualPane;
 
-import java.util.ArrayList;
+import javax.swing.*;
 
 /**
  * Created by 100rub on 09.04.2015.
@@ -14,44 +15,41 @@ public class Main
 {
     public static void main(String[] args)
     {
-        ArrayList<Object> list = new ArrayList<Object>();
+        VirtualPane vp = new VirtualPane();
         Contact c;
         ActionHandler handler = new ActionHandler();
 
         c = new Contact();
         c.setSize(10);
         c.setPosition(new PrecisePoint(1.5, -1.5));
-        list.add(c);
+        vp.getElements().add(c);
 
         c = new Contact();
         c.setSize(5);
         c.setPosition(new PrecisePoint(-1.5, 1.5));
-        list.add(c);
+        vp.getElements().add(c);
 
         try
         {
-            XMLHelper.Write(list, "1.xml");
-            list = (ArrayList<Object>)XMLHelper.Read("1.xml");
+            XMLHelper.Write("1.xml", vp);
+            vp = (VirtualPane)XMLHelper.Read("1.xml");
         }
         catch (Exception e)
         {
-
+            JOptionPane.showMessageDialog(null,
+                    "Error while trying to read/write file.\r\n" +
+                    "Exception: " + e.getClass().getName() + "\r\n" +
+                    "Message: " + e.getMessage() + ".",
+                "Error", JOptionPane.ERROR_MESSAGE);
         }
 
         MoveAction moveAction = new MoveAction();
 
-        c = (Contact)list.get(0);
+        c = (Contact)vp.getElements().get(0);
         handler.Do(moveAction, new PointTargetedActionParameters(c, new PrecisePoint(1, 1)));
 
-        try
-        {
-            handler.Undo();
-            handler.Redo();
-        }
-        catch (Exception e)
-        {
-
-        }
+        handler.Undo();
+        handler.Redo();
 
         MainForm mainForm = new MainForm();
     }

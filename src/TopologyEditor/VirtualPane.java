@@ -1,5 +1,8 @@
 package TopologyEditor;
 
+import TopologyEditor.Elements.Element;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,14 +10,31 @@ import java.util.List;
  */
 public class VirtualPane
 {
-    public List<Object> Elements;
+    private List<Element> _elements;
 
-    public PrecisePoint ViewPoint;
+    private PrecisePoint _viewPoint;
 
     public  VirtualPane()
     {
-        ViewPoint = new PrecisePoint();
+        _viewPoint = new PrecisePoint();
+        _elements = new ArrayList<Element>();
+    }
 
 
+
+    public PrecisePoint getViewPoint() {
+        return _viewPoint;
+    }
+
+    public void setViewPoint(PrecisePoint value) {
+        _viewPoint = value;
+    }
+
+    public List<Element> getElements() {
+        return _elements;
+    }
+
+    public void setElements(List<Element> value) {
+         _elements = value;
     }
 }
