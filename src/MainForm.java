@@ -9,6 +9,7 @@ import TopologyEditor.VirtualPane;
 import javafx.scene.layout.Pane;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -27,24 +28,27 @@ public class MainForm extends JFrame
     private JScrollBar scrollBarVer;
     private JScrollBar scrollBarHor;
     private JToolBar toolBar;
-    private JPanel drawPanel;
+    private JTabbedPane tabbedPane;
     //--------------
 
     private boolean leftMousePressed = false;
     private boolean rightMousePressed = false;
 
     private JDrawPanel CurrentPanel;    //pointer to currently selected JDrawPanel
+    private PrecisePoint mouseDownPosition;
+    private PrecisePoint mouseUpPosition;
+    private PrecisePoint previousMousePosition;
 
-    private PrecisePoint mouseClickPosition;     //mouse position inside JDrawPanel
+
 
     public void loadTestData()      //TODO load test file properly
     {
-        /*Contact c = new Contact();
+        Contact c = new Contact();
         c.setSize(10);
-        c.setPosition(new PrecisePoint(1.5, -1.5));
+        c.setPosition(new PrecisePoint(0, 0));
         CurrentPanel.getPane().getElements().add(c);
 
-        c = new Contact();
+        /*c = new Contact();
         c.setSize(5);
         c.setPosition(new PrecisePoint(-1.5, 1.5));
         CurrentPanel.getPane().getElements().add(c);
@@ -58,6 +62,8 @@ public class MainForm extends JFrame
         handler.Redo();*/
     }
 
+
+
     public MainForm()
     {
         super("Topology Editor");
@@ -69,79 +75,101 @@ public class MainForm extends JFrame
         rootPanel.setOpaque(true);
         toolBar.setFloatable(false);
 
-        drawPanel.addMouseListener(new MouseAdapter()
+        Panels.add(new JDrawPanel(null));       //creating empty pane for default
+        CurrentPanel = Panels.get(Panels.size()-1);     //setting it as current panel
+
+        initializeDrawPanelEvents(CurrentPanel);
+
+        tabbedPane.add(CurrentPanel, BorderLayout.CENTER);
+        tabbedPane.removeTabAt(0);
+
+        loadTestData();     //temporary for test
+
+        pack();
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setVisible(true);
+    }
+
+
+
+    private void initializeDrawPanelEvents(JDrawPanel panel)
+    {
+        panel.addMouseListener(new MouseAdapter()
         {
             /*public void mouseClicked(MouseEvent e)
             {
                 System.out.println("mouseClicked");
             }
+
             public void mouseEntered(MouseEvent e)
             {
                 System.out.println("mouseEntered");
             }
+
             public void mouseExited(MouseEvent e)
             {
                 System.out.println("mouseExited");
             }*/
+
             public void mousePressed(MouseEvent e)
             {
-                //System.out.println("mousePressed");
                 if(e.getButton() == MouseEvent.BUTTON1)
                 {
                     leftMousePressed = true;
-                    System.out.println("LeftMousePressed");
+                    //System.out.println("LeftMousePressed");
                 }
 
                 if(e.getButton() == MouseEvent.BUTTON3)
                 {
                     rightMousePressed = true;
-                    System.out.println("RightMousePressed");
+                    //System.out.println("RightMousePressed");
                 }
 
-                if(mouseClickPosition == null)
-                {
-                    mouseClickPosition = new PrecisePoint();
-                }
-                mouseClickPosition.setX(e.getX());
-                mouseClickPosition.setY(e.getY());
+                mouseDownPosition = new PrecisePoint(e.getX(), e.getY());
             }
+
             public void mouseReleased(MouseEvent e)
             {
-                //System.out.println("mouseReleased");
                 if(e.getButton() == MouseEvent.BUTTON1)
                 {
                     leftMousePressed = false;
-                    System.out.println("LeftMouseReleased");
+                    //System.out.println("LeftMouseReleased");
                 }
 
                 if(e.getButton() == MouseEvent.BUTTON3)
                 {
                     rightMousePressed = false;
-                    System.out.println("RightMouseReleased");
+                    //System.out.println("RightMouseReleased");
                 }
+
+                mouseUpPosition = new PrecisePoint(e.getX(), e.getY());
             }
         });
 
-        drawPanel.addMouseMotionListener(new MouseMotionListener()
+        panel.addMouseMotionListener(new MouseMotionListener()
         {
             public void mouseDragged(MouseEvent e)
             {
-                //System.out.println("mouseDragged");
+                if(previousMousePosition == null)
+                {
+                    previousMousePosition = new PrecisePoint(e.getX(), e.getY());
+                }
+
                 if(!leftMousePressed && rightMousePressed)
                 {
+                    double dx = e.getX() - previousMousePosition.getX();
+                    double dy = e.getY() - previousMousePosition.getY();
 
+                    CurrentPanel.get_viewPointCoordsInside().setX(CurrentPanel.get_viewPointCoordsInside().getX() - dx);        //TODO fix this
+                    CurrentPanel.get_viewPointCoordsInside().setY(CurrentPanel.get_viewPointCoordsInside().getY() - dy);
+
+                    System.out.println("viewPoint x=" + CurrentPanel.get_viewPointCoordsInside().getX() + " y=" + CurrentPanel.get_viewPointCoordsInside().getY());
                 }
-                /*double dx = e.getX() - mousePosition.getX();
-                double dy = e.getY() - mousePosition.getY();
-                CurrentPanel.getViewPoint().setX(CurrentPanel.getViewPoint().getX() - dx);
-                CurrentPanel.getViewPoint().setY(CurrentPanel.getViewPoint().getY() - dy);
 
-                System.out.println("mouseDragged dx=" + dx + " dy=" + dy);
+                previousMousePosition.setX(e.getX());
+                previousMousePosition.setY(e.getY());
 
-                RedrawPane();
-
-                mousePosition.setX(e.getX());
-                mousePosition.setY(e.getY());*/
+                CurrentPanel.repaint();
             }
 
             public void mouseMoved(MouseEvent e)
@@ -149,14 +177,9 @@ public class MainForm extends JFrame
                 //System.out.println("mouseMoved");
             }
         });
-
-        Panels.add(new JDrawPanel());       //creating empty pane for default
-        CurrentPanel = Panels.get(Panels.size()-1);     //setting it as current panel
-
-        pack();
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setVisible(true);
     }
+
+
 
     private VirtualPane loadPaneFromFile(String path)
     {
@@ -177,6 +200,8 @@ public class MainForm extends JFrame
         return null;
     }
 
+
+
     private void savePaneToFile(VirtualPane pane)
     {
         try
@@ -192,6 +217,8 @@ public class MainForm extends JFrame
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+
 
     private void RedrawPane()
     {

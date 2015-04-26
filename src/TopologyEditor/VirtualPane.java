@@ -11,8 +11,9 @@ import java.util.List;
 public class VirtualPane
 {
     private List<Element> _elements;
-
     private PrecisePoint _viewPoint;
+
+
 
     public  VirtualPane()
     {
@@ -26,13 +27,19 @@ public class VirtualPane
         return _viewPoint;
     }
 
+
+
     public void setViewPoint(PrecisePoint value) {
         _viewPoint = value;
     }
 
+
+
     public List<Element> getElements() {
         return _elements;
     }
+
+
 
     public void setElements(List<Element> value) {
          _elements = value;
