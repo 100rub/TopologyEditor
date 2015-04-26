@@ -20,4 +20,6 @@ public abstract class Element
     {
         _position = value;
     }
+
+    public abstract double getSize();
 }
