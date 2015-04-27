@@ -10,9 +10,7 @@ import javafx.scene.layout.Pane;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 /**
@@ -45,8 +43,12 @@ public class MainForm extends JFrame
     {
         Contact c = new Contact();
         c.setSize(10);
-        c.setPosition(new PrecisePoint(0, 0));
+        c.setPosition(new PrecisePoint(20, 20));
         CurrentPanel.getPane().getElements().add(c);
+
+        //PrecisePoint tmp = new PrecisePoint();
+        //System.out.println(tmp.ToString());
+        //System.out.println(CurrentPanel.translateOut(CurrentPanel.translateIn(tmp)).ToString());
 
         /*c = new Contact();
         c.setSize(5);
@@ -82,6 +84,7 @@ public class MainForm extends JFrame
 
         tabbedPane.add(CurrentPanel, BorderLayout.CENTER);
         tabbedPane.removeTabAt(0);
+        tabbedPane.setTitleAt(0, "Untitled");
 
         loadTestData();     //temporary for test
 
@@ -96,20 +99,20 @@ public class MainForm extends JFrame
     {
         panel.addMouseListener(new MouseAdapter()
         {
-            /*public void mouseClicked(MouseEvent e)
+            public void mouseClicked(MouseEvent e)
             {
-                System.out.println("mouseClicked");
+                //System.out.println("mouseClicked");
             }
 
             public void mouseEntered(MouseEvent e)
             {
-                System.out.println("mouseEntered");
+                //System.out.println("mouseEntered");
             }
 
             public void mouseExited(MouseEvent e)
             {
-                System.out.println("mouseExited");
-            }*/
+                //System.out.println("mouseExited");
+            }
 
             public void mousePressed(MouseEvent e)
             {
@@ -122,6 +125,7 @@ public class MainForm extends JFrame
                 if(e.getButton() == MouseEvent.BUTTON3)
                 {
                     rightMousePressed = true;
+                    previousMousePosition = new PrecisePoint(e.getX(), e.getY());
                     //System.out.println("RightMousePressed");
                 }
 
@@ -134,6 +138,10 @@ public class MainForm extends JFrame
                 {
                     leftMousePressed = false;
                     //System.out.println("LeftMouseReleased");
+                    if(rightMousePressed)
+                    {
+                        previousMousePosition = new PrecisePoint(e.getX(), e.getY());
+                    }
                 }
 
                 if(e.getButton() == MouseEvent.BUTTON3)
@@ -143,6 +151,7 @@ public class MainForm extends JFrame
                 }
 
                 mouseUpPosition = new PrecisePoint(e.getX(), e.getY());
+                //System.out.println("viewPoint x=" + CurrentPanel.get_viewPointCoordsInside().getX() + " y=" + CurrentPanel.get_viewPointCoordsInside().getY());
             }
         });
 
@@ -152,7 +161,7 @@ public class MainForm extends JFrame
             {
                 if(previousMousePosition == null)
                 {
-                    previousMousePosition = new PrecisePoint(e.getX(), e.getY());
+                    previousMousePosition = mouseDownPosition;
                 }
 
                 if(!leftMousePressed && rightMousePressed)
@@ -160,14 +169,11 @@ public class MainForm extends JFrame
                     double dx = e.getX() - previousMousePosition.getX();
                     double dy = e.getY() - previousMousePosition.getY();
 
-                    CurrentPanel.get_viewPointCoordsInside().setX(CurrentPanel.get_viewPointCoordsInside().getX() - dx);        //TODO fix this
-                    CurrentPanel.get_viewPointCoordsInside().setY(CurrentPanel.get_viewPointCoordsInside().getY() - dy);
+                    CurrentPanel.moveViewPoint(-dx, -dy);
 
-                    System.out.println("viewPoint x=" + CurrentPanel.get_viewPointCoordsInside().getX() + " y=" + CurrentPanel.get_viewPointCoordsInside().getY());
+                    previousMousePosition.setX(e.getX());
+                    previousMousePosition.setY(e.getY());
                 }
-
-                previousMousePosition.setX(e.getX());
-                previousMousePosition.setY(e.getY());
 
                 CurrentPanel.repaint();
             }
@@ -177,16 +183,51 @@ public class MainForm extends JFrame
                 //System.out.println("mouseMoved");
             }
         });
+
+        panel.addMouseWheelListener(new MouseWheelListener()
+        {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e)
+            {
+                int wheel_d = e.getWheelRotation();
+                //System.out.println("mouseWheelMoved " + wheel_d);
+
+                if(Math.abs(CurrentPanel.get_zoomLevel() + wheel_d) <= 20)
+                {
+                    CurrentPanel.set_zoomLevel(CurrentPanel.get_zoomLevel() + wheel_d);
+                }
+
+                int zoom_lvl = CurrentPanel.get_zoomLevel();
+                double res_zoom_coef = 1;
+                for(int i=0; i<Math.abs(zoom_lvl); i++)
+                {
+                    if(zoom_lvl < 0)
+                    {
+                        res_zoom_coef = res_zoom_coef * 1.1;
+                        //CurrentPanel.set_zoomCoefficient(CurrentPanel.get_zoomCoefficient() * 1.1);
+                    }
+                    if(zoom_lvl > 0)
+                    {
+                        res_zoom_coef = res_zoom_coef / 1.1;
+                        //CurrentPanel.set_zoomCoefficient(CurrentPanel.get_zoomCoefficient() / 1.1);
+                    }
+                }
+                CurrentPanel.set_zoomCoefficient(res_zoom_coef);
+                System.out.println("zoom_lvl " + CurrentPanel.get_zoomLevel());
+                System.out.println("zoom_coef " + CurrentPanel.get_zoomCoefficient());
+                CurrentPanel.repaint();
+            }
+        });
     }
 
 
 
-    private VirtualPane loadPaneFromFile(String path)
+    private VirtualPane loadPaneFromFile(String filename)
     {
         VirtualPane res;
         try
         {
-            res = (VirtualPane)XMLHelper.Read(path);
+            res = (VirtualPane)XMLHelper.Read(filename);
             return res;
         }
         catch (Exception e)
@@ -202,11 +243,11 @@ public class MainForm extends JFrame
 
 
 
-    private void savePaneToFile(VirtualPane pane)
+    private void savePaneToFile(VirtualPane pane, String filename)
     {
         try
         {
-            XMLHelper.Write("1.xml", pane);
+            XMLHelper.Write(filename, pane);
         }
         catch (Exception e)
         {
@@ -216,12 +257,5 @@ public class MainForm extends JFrame
                             "Message: " + e.getMessage() + ".",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-
-
-    private void RedrawPane()
-    {
-
     }
 }

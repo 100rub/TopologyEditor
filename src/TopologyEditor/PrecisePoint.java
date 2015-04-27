@@ -47,6 +47,12 @@ public class PrecisePoint
         return (new Point( (int)_x, (int)_y ));
     }
 
+
+    public String ToString()
+    {
+        return ("[x=" + (float)this.getX() + ", y=" + (float)this.getY() + "]");
+    }
+
     public PrecisePoint Copy()
     {
         PrecisePoint res = new PrecisePoint(this._x, this._y);
