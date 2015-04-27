@@ -27,6 +27,7 @@ public class MainForm extends JFrame
     private JScrollBar scrollBarHor;
     private JToolBar toolBar;
     private JTabbedPane tabbedPane;
+    private JButton FileButton;
     //--------------
 
     private boolean leftMousePressed = false;
@@ -213,8 +214,8 @@ public class MainForm extends JFrame
                     }
                 }
                 CurrentPanel.set_zoomCoefficient(res_zoom_coef);
-                System.out.println("zoom_lvl " + CurrentPanel.get_zoomLevel());
-                System.out.println("zoom_coef " + CurrentPanel.get_zoomCoefficient());
+                //System.out.println("zoom_lvl " + CurrentPanel.get_zoomLevel());
+                //System.out.println("zoom_coef " + CurrentPanel.get_zoomCoefficient());
                 CurrentPanel.repaint();
             }
         });

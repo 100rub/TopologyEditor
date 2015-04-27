@@ -243,11 +243,12 @@ public class JDrawPanel extends JPanel
         {
             //TODO paint elements properly
             Element tmp = _assignedPane.getElements().get(i);
-            int x = (int)(tmp.getPosition().getX() - tmp.getSize()/2*_zoomCoefficient);
-            int y = (int)(tmp.getPosition().getY() - tmp.getSize()/2*_zoomCoefficient);
-            PrecisePoint pnttmp = new PrecisePoint(x,y);
-            pnttmp = translateOut(pnttmp);
-            g2d.drawRect((int)pnttmp.getX(), (int)pnttmp.getY(), (int)(tmp.getSize()*_zoomCoefficient), (int)(tmp.getSize()*_zoomCoefficient));
+            paintMarker(g2d, translateOut(tmp.getPosition()));
+            //int x = (int)(tmp.getPosition().getX() - tmp.getSize()/2*_zoomCoefficient);
+            //int y = (int)(tmp.getPosition().getY() - tmp.getSize()/2*_zoomCoefficient);
+            //PrecisePoint pnttmp = new PrecisePoint(x,y);
+            //pnttmp = translateOut(pnttmp);
+            //g2d.drawRect((int)pnttmp.getX(), (int)pnttmp.getY(), (int)(tmp.getSize()*_zoomCoefficient), (int)(tmp.getSize()*_zoomCoefficient));
         }
     }
 }

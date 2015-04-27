@@ -30,7 +30,17 @@
         </constraints>
         <properties/>
         <border type="none"/>
-        <children/>
+        <children>
+          <component id="f6374" class="javax.swing.JButton" binding="FileButton">
+            <constraints/>
+            <properties>
+              <horizontalTextPosition value="0"/>
+              <minimumSize width="30" height="28"/>
+              <preferredSize width="100" height="28"/>
+              <text value="File"/>
+            </properties>
+          </component>
+        </children>
       </toolbar>
       <tabbedpane id="1fc03" binding="tabbedPane">
         <constraints>
