@@ -26,11 +26,8 @@ public class MainForm extends JFrame
     private JPanel rootPanel;
     private JScrollBar scrollBarVer;
     private JScrollBar scrollBarHor;
-    private JToolBar toolBar;
+    private JMenuBar MenuBar;
     private JTabbedPane tabbedPane;
-    private JButton FileButton;
-    private JButton EditButton;
-    private JButton ViewButton;
     private JPanel ProtertiesPanel;
     //--------------
 
@@ -85,7 +82,9 @@ public class MainForm extends JFrame
         setContentPane(rootPanel);
         rootPanel.setOpaque(true);
         rootPanel.setPreferredSize(new Dimension(800, 600));
-        toolBar.setFloatable(false);
+        MenuBar = new JMenuBar();
+        MenuBar.setPreferredSize(new Dimension(-1, 20));
+        this.setJMenuBar(MenuBar);
 
         Panels.add(new JDrawPanel(null));               //creating empty pane for default
         CurrentPanel = Panels.get(Panels.size()-1);     //setting it as current panel
@@ -233,12 +232,12 @@ public class MainForm extends JFrame
 
                 if(wheel_d < 0)
                 {
-                    CurrentPanel.MoveViewPoint(d.getX()*CurrentPanel.getZoomCoefficient(), d.getY()*CurrentPanel.getZoomCoefficient());
+                    CurrentPanel.MoveViewPoint(d.getX() * CurrentPanel.getZoomCoefficient(), d.getY() * CurrentPanel.getZoomCoefficient());
                 }
 
                 if(wheel_d > 0)
                 {
-                    CurrentPanel.MoveViewPoint(d.getX()*CurrentPanel.getZoomCoefficient(), d.getY()*CurrentPanel.getZoomCoefficient());
+                    CurrentPanel.MoveViewPoint(d.getX() * CurrentPanel.getZoomCoefficient(), d.getY() * CurrentPanel.getZoomCoefficient());
                 }
 
                 //System.out.println("zoom_lvl " + CurrentPanel.get_zoomLevel());
