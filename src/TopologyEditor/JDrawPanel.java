@@ -38,7 +38,7 @@ public class JDrawPanel extends JPanel
 
 
 
-    public void assignPane(VirtualPane pane)
+    public void AssignPane(VirtualPane pane)
     {
         if(_assignedPane != null)
         {
@@ -57,71 +57,71 @@ public class JDrawPanel extends JPanel
 
 
 
-    public PrecisePoint get_viewPoint()
+    public PrecisePoint getViewPoint()
     {
         return _viewPoint;
     }
 
 
 
-    public void set_viewPoint(PrecisePoint pnt)
+    public void setViewPoint(PrecisePoint pnt)
     {
         _viewPoint = pnt;
     }
 
 
 
-    public PrecisePoint get_viewPanelCenter()
+    public PrecisePoint getViewPanelCenter()
     {
         return _viewPanelCenter;
     }
 
 
 
-    public void set_viewPanelCenter(PrecisePoint pnt)
+    public void setViewPanelCenter(PrecisePoint pnt)
     {
         _viewPanelCenter = pnt;
     }
 
 
 
-    public int get_zoomLevel()
+    public int getZoomLevel()
     {
         return _zoomLevel;
     }
 
 
 
-    public void set_zoomLevel(int lvl)
+    public void setZoomLevel(int lvl)
     {
         _zoomLevel = lvl;
     }
 
 
 
-    public void set_zoomCoefficient(double d)
+    public void setZoomCoefficient(double d)
     {
         _zoomCoefficient = d;
     }
 
 
 
-    public double get_zoomCoefficient()
+    public double getZoomCoefficient()
     {
         return _zoomCoefficient;
     }
 
 
 
-    public void moveViewPoint(double x, double y)
+    public void MoveViewPoint(double x, double y)
     {
         _viewPoint.setX(_viewPoint.getX() + x / _zoomCoefficient);
-        _viewPoint.setY(_viewPoint.getY() - y / _zoomCoefficient);
+        _viewPoint.setY(_viewPoint.getY() + y / _zoomCoefficient);
     }
 
 
 
-    public PrecisePoint translateIn(PrecisePoint pnt)      //translates position from DrawPanel into position on VirtualPane
+    public PrecisePoint TranslateIn(PrecisePoint pnt)      //translates position from DrawPanel into position on VirtualPane
     {
         PrecisePoint res = new PrecisePoint();
 
@@ -136,7 +136,7 @@ public class JDrawPanel extends JPanel
 
 
 
-    public PrecisePoint translateOut(PrecisePoint pnt)     //translates position from VirtualPane into position on DrawPanel
+    public PrecisePoint TranslateOut(PrecisePoint pnt)     //translates position from VirtualPane into position on DrawPanel
     {
         PrecisePoint res = new PrecisePoint();
 
@@ -172,9 +172,10 @@ public class JDrawPanel extends JPanel
     }
 
 
-    private void paintElement(Graphics2D g2d, Element elem)
-    {
 
+    private boolean elementIsOnScreen(Element elem)
+    {
+        return elem.IsOnScreen(TranslateIn(new PrecisePoint()), TranslateIn(new PrecisePoint(this.getWidth(), this.getHeight())));
     }
 
 
@@ -191,7 +192,7 @@ public class JDrawPanel extends JPanel
 
         //painting grid
         g2d.setColor(new Color(0, 0, 0));
-        PrecisePoint leftTopMostScreenPoint = translateIn(new PrecisePoint());
+        PrecisePoint leftTopMostScreenPoint = TranslateIn(new PrecisePoint());
 
         //System.out.println("leftTopMostScreenPoint=" + leftTopMostScreenPoint.ToString());
 
@@ -203,7 +204,7 @@ public class JDrawPanel extends JPanel
 
         double curr_grid_dist = gridPointsDistance;
 
-        if(_zoomLevel >= 13)
+        if(_zoomLevel >= 13)        //TODO upgrade zooming
         {
             curr_grid_dist = curr_grid_dist * 2;
         }
@@ -221,11 +222,11 @@ public class JDrawPanel extends JPanel
             for(int j=0; j<y_count; j++)
             {
                 PrecisePoint pnt = new PrecisePoint(leftTopMostGridPoint.getX() + curr_grid_dist*i, leftTopMostGridPoint.getY() - curr_grid_dist*j);
-                paintPoint(g2d, translateOut(pnt));
+                paintPoint(g2d, TranslateOut(pnt));
             }
         }
 
-        PrecisePoint zero = translateOut(new PrecisePoint());
+        PrecisePoint zero = TranslateOut(new PrecisePoint());
 
         //System.out.println(zero.ToString());
 
@@ -242,13 +243,11 @@ public class JDrawPanel extends JPanel
         for(int i=0; i<_assignedPane.getElements().size(); i++)
         {
             //TODO paint elements properly
-            Element tmp = _assignedPane.getElements().get(i);
-            paintMarker(g2d, translateOut(tmp.getPosition()));
-            //int x = (int)(tmp.getPosition().getX() - tmp.getSize()/2*_zoomCoefficient);
-            //int y = (int)(tmp.getPosition().getY() - tmp.getSize()/2*_zoomCoefficient);
-            //PrecisePoint pnttmp = new PrecisePoint(x,y);
-            //pnttmp = translateOut(pnttmp);
-            //g2d.drawRect((int)pnttmp.getX(), (int)pnttmp.getY(), (int)(tmp.getSize()*_zoomCoefficient), (int)(tmp.getSize()*_zoomCoefficient));
+            Element elem = _assignedPane.getElements().get(i);
+            if(elementIsOnScreen(elem))
+            {
+                paintMarker(g2d, TranslateOut(elem.getPosition()));
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by 100rub on 09.04.2015.
@@ -28,6 +29,9 @@ public class MainForm extends JFrame
     private JToolBar toolBar;
     private JTabbedPane tabbedPane;
     private JButton FileButton;
+    private JButton EditButton;
+    private JButton ViewButton;
+    private JPanel ProtertiesPanel;
     //--------------
 
     private boolean leftMousePressed = false;
@@ -42,10 +46,14 @@ public class MainForm extends JFrame
 
     public void loadTestData()      //TODO load test file properly
     {
-        Contact c = new Contact();
-        c.setSize(10);
-        c.setPosition(new PrecisePoint(20, 20));
-        CurrentPanel.getPane().getElements().add(c);
+        Random r = new Random();
+        for(int i=0; i<100; i++)
+        {
+            Contact c = new Contact();
+            c.setSize(10);
+            c.setPosition(new PrecisePoint(r.nextDouble()*1000-500, r.nextDouble()*1000-500));
+            CurrentPanel.getPane().getElements().add(c);
+        }
 
         //PrecisePoint tmp = new PrecisePoint();
         //System.out.println(tmp.ToString());
@@ -76,9 +84,10 @@ public class MainForm extends JFrame
 
         setContentPane(rootPanel);
         rootPanel.setOpaque(true);
+        rootPanel.setPreferredSize(new Dimension(800, 600));
         toolBar.setFloatable(false);
 
-        Panels.add(new JDrawPanel(null));       //creating empty pane for default
+        Panels.add(new JDrawPanel(null));               //creating empty pane for default
         CurrentPanel = Panels.get(Panels.size()-1);     //setting it as current panel
 
         initializeDrawPanelEvents(CurrentPanel);
@@ -117,13 +126,13 @@ public class MainForm extends JFrame
 
             public void mousePressed(MouseEvent e)
             {
-                if(e.getButton() == MouseEvent.BUTTON1)
+                if(e.getButton() == MouseEvent.BUTTON1)     //left mouse button
                 {
                     leftMousePressed = true;
                     //System.out.println("LeftMousePressed");
                 }
 
-                if(e.getButton() == MouseEvent.BUTTON3)
+                if(e.getButton() == MouseEvent.BUTTON3)     //right mouse button
                 {
                     rightMousePressed = true;
                     previousMousePosition = new PrecisePoint(e.getX(), e.getY());
@@ -170,7 +179,7 @@ public class MainForm extends JFrame
                     double dx = e.getX() - previousMousePosition.getX();
                     double dy = e.getY() - previousMousePosition.getY();
 
-                    CurrentPanel.moveViewPoint(-dx, -dy);
+                    CurrentPanel.MoveViewPoint(-dx, dy);
 
                     previousMousePosition.setX(e.getX());
                     previousMousePosition.setY(e.getY());
@@ -193,12 +202,12 @@ public class MainForm extends JFrame
                 int wheel_d = e.getWheelRotation();
                 //System.out.println("mouseWheelMoved " + wheel_d);
 
-                if(Math.abs(CurrentPanel.get_zoomLevel() + wheel_d) <= 20)
+                if(Math.abs(CurrentPanel.getZoomLevel() + wheel_d) <= 20)
                 {
-                    CurrentPanel.set_zoomLevel(CurrentPanel.get_zoomLevel() + wheel_d);
+                    CurrentPanel.setZoomLevel(CurrentPanel.getZoomLevel() + wheel_d);
                 }
 
-                int zoom_lvl = CurrentPanel.get_zoomLevel();
+                int zoom_lvl = CurrentPanel.getZoomLevel();
                 double res_zoom_coef = 1;
                 for(int i=0; i<Math.abs(zoom_lvl); i++)
                 {
@@ -213,12 +222,37 @@ public class MainForm extends JFrame
                         //CurrentPanel.set_zoomCoefficient(CurrentPanel.get_zoomCoefficient() / 1.1);
                     }
                 }
-                CurrentPanel.set_zoomCoefficient(res_zoom_coef);
+
+                PrecisePoint mousePosInsideBefore = CurrentPanel.TranslateIn(new PrecisePoint(e.getX(), e.getY()));
+
+                CurrentPanel.setZoomCoefficient(res_zoom_coef);
+
+                PrecisePoint mousePosInsideAfter = CurrentPanel.TranslateIn(new PrecisePoint(e.getX(), e.getY()));
+
+                PrecisePoint d = new PrecisePoint(mousePosInsideBefore.getX()-mousePosInsideAfter.getX(), mousePosInsideBefore.getY()-mousePosInsideAfter.getY());
+
+                if(wheel_d < 0)
+                {
+                    CurrentPanel.MoveViewPoint(d.getX()*CurrentPanel.getZoomCoefficient(), d.getY()*CurrentPanel.getZoomCoefficient());
+                }
+
+                if(wheel_d > 0)
+                {
+                    CurrentPanel.MoveViewPoint(d.getX()*CurrentPanel.getZoomCoefficient(), d.getY()*CurrentPanel.getZoomCoefficient());
+                }
+
                 //System.out.println("zoom_lvl " + CurrentPanel.get_zoomLevel());
                 //System.out.println("zoom_coef " + CurrentPanel.get_zoomCoefficient());
                 CurrentPanel.repaint();
             }
         });
+    }
+
+
+
+    private void initializeScrollBarsEvents()
+    {
+
     }
 
 
