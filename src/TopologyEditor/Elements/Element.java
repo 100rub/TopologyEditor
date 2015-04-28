@@ -1,6 +1,9 @@
 package TopologyEditor.Elements;
 
 import TopologyEditor.PrecisePoint;
+import TopologyEditor.VirtualPane;
+
+import java.awt.*;
 
 /**
  * Created by VEF on 23.04.2015.
@@ -8,6 +11,7 @@ import TopologyEditor.PrecisePoint;
 public abstract class Element
 {
     private PrecisePoint _position;
+    private VirtualPane _parent;
 
 
 
@@ -21,5 +25,7 @@ public abstract class Element
         _position = value;
     }
 
-    public abstract double getSize();
+    public abstract boolean IsOnScreen(PrecisePoint leftTop, PrecisePoint rightBottom);
+
+    public abstract void Draw(Graphics graphics, int layer);
 }
