@@ -1,4 +1,5 @@
 import TopologyEditor.DataStoring.XMLHelper;
+import TopologyEditor.Elements.Element;
 import TopologyEditor.EventsHandling.ActionHandler;
 import TopologyEditor.EventsHandling.PointTargetedActionParameters;
 import TopologyEditor.JDrawPanel;
@@ -29,6 +30,18 @@ public class MainForm extends JFrame
     private JMenuBar MenuBar;
     private JTabbedPane tabbedPane;
     private JPanel ProtertiesPanel;
+
+    private JMenu FileMenu;
+    private JMenu EditMenu;
+    private JMenu ViewMenu;
+
+    private JMenuItem NewMenuItem;
+    private JMenuItem OpenMenuItem;
+    private JMenuItem SaveMenuItem;
+
+    private JMenuItem UndoMenuItem;
+    private JMenuItem RedoMenuItem;
+    private JMenuItem SettingsMenuItem;
     //--------------
 
     private boolean leftMousePressed = false;
@@ -39,7 +52,7 @@ public class MainForm extends JFrame
     private PrecisePoint mouseUpPosition;
     private PrecisePoint previousMousePosition;
 
-
+    private Element SelectedElement;
 
     public void loadTestData()      //TODO load test file properly
     {
@@ -81,10 +94,99 @@ public class MainForm extends JFrame
 
         setContentPane(rootPanel);
         rootPanel.setOpaque(true);
-        rootPanel.setPreferredSize(new Dimension(800, 600));
+        rootPanel.setPreferredSize(new Dimension(1024, 768));
+
         MenuBar = new JMenuBar();
         MenuBar.setPreferredSize(new Dimension(-1, 20));
         this.setJMenuBar(MenuBar);
+
+        //------------------
+        {
+            FileMenu = new JMenu("File");
+            MenuBar.add(FileMenu);
+
+            NewMenuItem = new JMenuItem("New");
+            FileMenu.add(NewMenuItem);
+            NewMenuItem.addActionListener(new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    System.out.println("NewMenuItem Clicked");
+                }
+            });
+
+            OpenMenuItem = new JMenuItem("Open");
+            FileMenu.add(OpenMenuItem);
+            OpenMenuItem.addActionListener(new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    System.out.println("OpenMenuItem Clicked");
+                }
+            });
+
+            SaveMenuItem = new JMenuItem("Save");
+            FileMenu.add(SaveMenuItem);
+            SaveMenuItem.addActionListener(new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    System.out.println("SaveMenuItem Clicked");
+                }
+            });
+        }
+        //--------------------
+
+        //--------------------
+        {
+            EditMenu = new JMenu("Edit");
+            MenuBar.add(EditMenu);
+
+            UndoMenuItem = new JMenuItem("Undo");
+            EditMenu.add(UndoMenuItem);
+            UndoMenuItem.addActionListener(new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    System.out.println("UndoMenuItem Clicked");
+                }
+            });
+
+            RedoMenuItem = new JMenuItem("Redo");
+            EditMenu.add(RedoMenuItem);
+            RedoMenuItem.addActionListener(new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    System.out.println("RedoMenuItem Clicked");
+                }
+            });
+
+            SettingsMenuItem = new JMenuItem("Settings");
+            EditMenu.add(SettingsMenuItem);
+            SettingsMenuItem.addActionListener(new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    System.out.println("SettingsMenuItem Clicked");
+                }
+            });
+        }
+        //--------------------
+
+        //--------------------
+        {
+            //TODO add menus
+            //ViewMenu = new JMenu("View");
+            //MenuBar.add(ViewMenu);
+        }
+        //-----------------
 
         Panels.add(new JDrawPanel(null));               //creating empty pane for default
         CurrentPanel = Panels.get(Panels.size()-1);     //setting it as current panel
@@ -94,6 +196,8 @@ public class MainForm extends JFrame
         tabbedPane.add(CurrentPanel, BorderLayout.CENTER);
         tabbedPane.removeTabAt(0);
         tabbedPane.setTitleAt(0, "Untitled");
+
+        SelectedElement = null;
 
         loadTestData();     //temporary for test
 
@@ -110,7 +214,23 @@ public class MainForm extends JFrame
         {
             public void mouseClicked(MouseEvent e)
             {
-                //System.out.println("mouseClicked");
+                if(e.getButton() == MouseEvent.BUTTON1)     //left mouse button
+                {
+                    System.out.println("LeftMouseClicked");
+                    if(!rightMousePressed)
+                    {
+                        SelectedElement = CurrentPanel.SelectElement(CurrentPanel.TranslateIn(new PrecisePoint(e.getX(), e.getY())));
+                    }
+                }
+
+                if(e.getButton() == MouseEvent.BUTTON3)     //right mouse button
+                {
+                    System.out.println("RightMouseClicked");
+                    if(!leftMousePressed)
+                    {
+
+                    }
+                }
             }
 
             public void mouseEntered(MouseEvent e)

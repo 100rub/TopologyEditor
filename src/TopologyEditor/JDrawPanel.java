@@ -50,6 +50,17 @@ public class JDrawPanel extends JPanel
 
 
 
+    public Element SelectElement(PrecisePoint pnt)      //point should be in VirtualPane internal coordinates
+    {
+        if(_assignedPane != null)
+        {
+            //TODO select element
+        }
+        return null;
+    }
+
+
+
     public VirtualPane getPane()
     {
         return _assignedPane;
