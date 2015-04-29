@@ -45,17 +45,17 @@ public final class ActionHandler
         return true;
     }
 
-    public Iterable<ActionInfo> getActions()
+    public Iterable<ActionInfo> GetActions()
     {
         return _actions;
     }
 
-    public ActionInfo getLastAction()
+    public ActionInfo GetLastAction()
     {
         return _actions.peek();
     }
 
-    public ActionInfo getLastUndo()
+    public ActionInfo GetLastUndo()
     {
         return _undoes.peek();
     }

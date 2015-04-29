@@ -1,7 +1,9 @@
 package TopologyEditor;
 
+import TopologyEditor.DataStoring.XMLHelper;
 import TopologyEditor.Elements.Element;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,7 @@ public class VirtualPane
 {
     private List<Element> _elements;
     private PrecisePoint _viewPoint;
+    private String _fileName;
 
 
 
@@ -19,6 +22,7 @@ public class VirtualPane
     {
         _viewPoint = new PrecisePoint();
         _elements = new ArrayList<Element>();
+        _fileName = null;
     }
 
 
@@ -43,5 +47,63 @@ public class VirtualPane
 
     public void setElements(List<Element> value) {
          _elements = value;
+    }
+
+
+
+    public Element SelectElement(PrecisePoint point)
+    {
+        Element temp = null;
+
+        return temp;
+    }
+
+
+
+    public boolean Save()
+    {
+        if (_fileName == null)
+            return false;
+        try
+        {
+            XMLHelper.Write(_fileName, this);
+        }
+        catch (FileNotFoundException e)
+        {
+            return false;
+        }
+        return true;
+    }
+
+
+
+    public boolean SaveAs(String path)
+    {
+        _fileName = path;
+        try
+        {
+            XMLHelper.Write(_fileName, this);
+        }
+        catch (FileNotFoundException e)
+        {
+            return false;
+        }
+        return true;
+    }
+
+
+
+    public static VirtualPane Load(String path)
+    {
+        try
+        {
+            VirtualPane pane = (VirtualPane)XMLHelper.Read(path);
+            pane._fileName = path;
+            return pane;
+        }
+        catch (FileNotFoundException e)
+        {
+            return null;
+        }
     }
 }

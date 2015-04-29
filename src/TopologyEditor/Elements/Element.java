@@ -27,5 +27,7 @@ public abstract class Element
 
     public abstract boolean IsOnScreen(PrecisePoint leftTop, PrecisePoint rightBottom);
 
+    public abstract boolean IsClicked(PrecisePoint point);
+
     public abstract void Draw(Graphics graphics, int layer);
 }

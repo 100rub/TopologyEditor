@@ -37,4 +37,8 @@ public class Contact extends Element
                 pos.getX() - _size < rightBottom.getX() &&
                 pos.getY() + _size > rightBottom.getY();
     }
+
+    public boolean IsClicked(PrecisePoint point) {
+        return IsOnScreen(point, point);
+    }
 }
