@@ -29,7 +29,7 @@ public class MainForm extends JFrame
     private JScrollBar scrollBarHor;
     private JMenuBar MenuBar;
     private JTabbedPane tabbedPane;
-    private JPanel ProtertiesPanel;
+    private JPanel PropertiesPanel;
 
     private JMenu FileMenu;
     private JMenu EditMenu;
@@ -38,6 +38,7 @@ public class MainForm extends JFrame
     private JMenuItem NewMenuItem;
     private JMenuItem OpenMenuItem;
     private JMenuItem SaveMenuItem;
+    private JMenuItem SaveAsMenuItem;
 
     private JMenuItem UndoMenuItem;
     private JMenuItem RedoMenuItem;
@@ -54,7 +55,7 @@ public class MainForm extends JFrame
 
     private Element SelectedElement;
 
-    public void loadTestData()      //TODO load test file properly
+    public void loadTestData()      //TODO remove
     {
         Random r = new Random();
         for(int i=0; i<100; i++)
@@ -109,10 +110,10 @@ public class MainForm extends JFrame
             FileMenu.add(NewMenuItem);
             NewMenuItem.addActionListener(new ActionListener()
             {
-                @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    System.out.println("NewMenuItem Clicked");
+                    //System.out.println("NewMenuItem Clicked");
+                    New(e);
                 }
             });
 
@@ -120,10 +121,10 @@ public class MainForm extends JFrame
             FileMenu.add(OpenMenuItem);
             OpenMenuItem.addActionListener(new ActionListener()
             {
-                @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    System.out.println("OpenMenuItem Clicked");
+                    //System.out.println("OpenMenuItem Clicked");
+                    Open(e);
                 }
             });
 
@@ -131,10 +132,21 @@ public class MainForm extends JFrame
             FileMenu.add(SaveMenuItem);
             SaveMenuItem.addActionListener(new ActionListener()
             {
-                @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    System.out.println("SaveMenuItem Clicked");
+                    //System.out.println("SaveMenuItem Clicked");
+                    Save(e);
+                }
+            });
+
+            SaveAsMenuItem = new JMenuItem("Save As");
+            FileMenu.add(SaveAsMenuItem);
+            SaveAsMenuItem.addActionListener(new ActionListener()
+            {
+                public void actionPerformed(ActionEvent e)
+                {
+                    //System.out.println("SaveAsMenuItem Clicked");
+                    SaveAs(e);
                 }
             });
         }
@@ -149,10 +161,10 @@ public class MainForm extends JFrame
             EditMenu.add(UndoMenuItem);
             UndoMenuItem.addActionListener(new ActionListener()
             {
-                @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    System.out.println("UndoMenuItem Clicked");
+                    //System.out.println("UndoMenuItem Clicked");
+                    Undo(e);
                 }
             });
 
@@ -160,10 +172,10 @@ public class MainForm extends JFrame
             EditMenu.add(RedoMenuItem);
             RedoMenuItem.addActionListener(new ActionListener()
             {
-                @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    System.out.println("RedoMenuItem Clicked");
+                    //System.out.println("RedoMenuItem Clicked");
+                    Redo(e);
                 }
             });
 
@@ -171,10 +183,10 @@ public class MainForm extends JFrame
             EditMenu.add(SettingsMenuItem);
             SettingsMenuItem.addActionListener(new ActionListener()
             {
-                @Override
                 public void actionPerformed(ActionEvent e)
                 {
-                    System.out.println("SettingsMenuItem Clicked");
+                    //System.out.println("SettingsMenuItem Clicked");
+                    Settings(e);
                 }
             });
         }
@@ -199,7 +211,9 @@ public class MainForm extends JFrame
 
         SelectedElement = null;
 
-        loadTestData();     //temporary for test
+        //loadTestData();     //TODO REMOVE
+
+        UpdateUI();
 
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -369,47 +383,129 @@ public class MainForm extends JFrame
 
 
 
-    private void initializeScrollBarsEvents()
+    private void New(ActionEvent e)
+    {
+        if(CurrentPanel.getHasUnsavedChanges())
+        {
+            Object[] options = {"Yes", "No"};
+            int returnVal = JOptionPane.showOptionDialog(this,
+                    "Your current project has unsaved changes that will be lost if you continue. Do you want to continue anyway?",
+                    "Warning",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE,
+                    null,
+                    options,
+                    options[1]);
+            if(returnVal == JOptionPane.YES_OPTION)
+            {
+                CurrentPanel.AssignPane(new VirtualPane());
+                //System.out.println("YES_OPTION");
+            }
+        }
+        else
+        {
+            CurrentPanel.AssignPane(new VirtualPane());
+        }
+        UpdateUI();
+    }
+
+
+
+    private void Open(ActionEvent e)
+    {
+        if(CurrentPanel.getHasUnsavedChanges())
+        {
+            Object[] options = {"Yes", "No"};
+            int returnVal = JOptionPane.showOptionDialog(this,
+                    "Your current project has unsaved changes that will be lost if you continue. Do you want to continue anyway?",
+                    "Warning",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE,
+                    null,
+                    options,
+                    options[1]);
+            if(returnVal == JOptionPane.YES_OPTION)
+            {
+                final JFileChooser fc = new JFileChooser();
+                int result = fc.showOpenDialog(rootPanel);
+                if (result == JFileChooser.APPROVE_OPTION)
+                {
+                    CurrentPanel.AssignPane(VirtualPane.Load(fc.getSelectedFile().getAbsolutePath()));
+                }
+            }
+        }
+        else
+        {
+            final JFileChooser fc = new JFileChooser();
+            int result = fc.showOpenDialog(rootPanel);
+            if (result == JFileChooser.APPROVE_OPTION)
+            {
+                CurrentPanel.AssignPane(VirtualPane.Load(fc.getSelectedFile().getAbsolutePath()));
+            }
+        }
+        UpdateUI();
+    }
+
+
+
+    private void Save(ActionEvent e)
+    {
+        if(!CurrentPanel.getPane().Save())
+        {
+            final JFileChooser fc = new JFileChooser();
+            int returnVal = fc.showSaveDialog(rootPanel);
+            if (returnVal == JFileChooser.APPROVE_OPTION)
+            {
+                CurrentPanel.getPane().SaveAs(fc.getSelectedFile().getAbsolutePath());
+                CurrentPanel.setHasUnsavedChanges(false);
+            }
+        }
+        else
+        {
+            CurrentPanel.setHasUnsavedChanges(false);
+        }
+        UpdateUI();
+    }
+
+
+
+    private void SaveAs(ActionEvent e)
+    {
+        final JFileChooser fc = new JFileChooser();
+        int returnVal = fc.showSaveDialog(rootPanel);
+        if (returnVal == JFileChooser.APPROVE_OPTION)
+        {
+            CurrentPanel.getPane().SaveAs(fc.getSelectedFile().getAbsolutePath());
+            CurrentPanel.setHasUnsavedChanges(false);
+        }
+        UpdateUI();
+    }
+
+
+
+    private void Undo(ActionEvent e)
     {
 
     }
 
 
 
-    private VirtualPane loadPaneFromFile(String filename)
+    private void Redo(ActionEvent e)
     {
-        VirtualPane res;
-        try
-        {
-            res = (VirtualPane)XMLHelper.Read(filename);
-            return res;
-        }
-        catch (Exception e)
-        {
-            JOptionPane.showMessageDialog(null,
-                    "Error while trying to read/write file.\r\n" +
-                            "Exception: " + e.getClass().getName() + "\r\n" +
-                            "Message: " + e.getMessage() + ".",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        return null;
+
     }
 
 
 
-    private void savePaneToFile(VirtualPane pane, String filename)
+    private void Settings(ActionEvent e)
     {
-        try
-        {
-            XMLHelper.Write(filename, pane);
-        }
-        catch (Exception e)
-        {
-            JOptionPane.showMessageDialog(null,
-                    "Error while trying to read/write file.\r\n" +
-                            "Exception: " + e.getClass().getName() + "\r\n" +
-                            "Message: " + e.getMessage() + ".",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-        }
+
+    }
+
+
+
+    private void UpdateUI()
+    {
+        //UndoMenuItem.setEnabled(handler.);
     }
 }
