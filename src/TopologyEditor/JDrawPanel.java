@@ -20,6 +20,8 @@ public class JDrawPanel extends JPanel
     private PrecisePoint _viewPanelCenter;
     private int gridPointsDistance = 20;
 
+    private boolean _hasUnsavedChanges;
+
 
     public JDrawPanel(VirtualPane pane)
     {
@@ -34,6 +36,7 @@ public class JDrawPanel extends JPanel
         _zoomLevel = 0;
         _zoomCoefficient = 1;
         _viewPoint = new PrecisePoint();
+        _hasUnsavedChanges = false;
     }
 
 
@@ -54,7 +57,7 @@ public class JDrawPanel extends JPanel
     {
         if(_assignedPane != null)
         {
-            //TODO select element
+            return _assignedPane.SelectElement(pnt);
         }
         return null;
     }
@@ -106,6 +109,20 @@ public class JDrawPanel extends JPanel
     public void setZoomLevel(int lvl)
     {
         _zoomLevel = lvl;
+    }
+
+
+
+    public boolean getHasUnsavedChanges()
+    {
+        return _hasUnsavedChanges;
+    }
+
+
+
+    public void setHasUnsavedChanges(boolean b)
+    {
+        _hasUnsavedChanges = b;
     }
 
 
