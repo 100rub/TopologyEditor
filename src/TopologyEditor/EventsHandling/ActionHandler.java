@@ -1,5 +1,6 @@
 package TopologyEditor.EventsHandling;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -45,7 +46,7 @@ public final class ActionHandler
         return true;
     }
 
-    public Iterable<ActionInfo> GetActions()
+    public Collection<ActionInfo> GetActions()
     {
         return _actions;
     }
