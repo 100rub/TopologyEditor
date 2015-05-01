@@ -22,6 +22,7 @@ public final class ActionInfo
     {
         return _action;
     }
+    
     protected void setAction(Action value)
     {
         _action = value;
