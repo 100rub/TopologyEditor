@@ -20,4 +20,9 @@ public class Contact extends Element
     {
         _size = value;
     }
+
+    public String GetName()
+    {
+        return "Контакт";
+    }
 }

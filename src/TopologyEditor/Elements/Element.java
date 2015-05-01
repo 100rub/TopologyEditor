@@ -13,6 +13,8 @@ public abstract class Element
 
 
 
+    public abstract String GetName();
+
     public PrecisePoint getPosition()
     {
         return _position;
