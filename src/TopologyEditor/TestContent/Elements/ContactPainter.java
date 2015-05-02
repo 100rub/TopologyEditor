@@ -12,7 +12,7 @@ import java.awt.*;
  */
 public class ContactPainter implements Painter
 {
-    public void Draw(Element element, Graphics graphics, CoordinateTranslator translator)
+    public void Draw(Element element, Graphics2D graphics, CoordinateTranslator translator)
     {
         PrecisePoint pos = translator.TranslatePointOut(element.getPosition());
         double diameter = ((Contact)element).getSize() / 2;

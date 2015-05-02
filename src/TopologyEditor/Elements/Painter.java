@@ -10,7 +10,7 @@ import java.awt.*;
  */
 public interface Painter
 {
-    public void Draw(Element element, Graphics graphics, CoordinateTranslator translator);
+    public void Draw(Element element, Graphics2D graphics, CoordinateTranslator translator);
 
     public boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom);
 
