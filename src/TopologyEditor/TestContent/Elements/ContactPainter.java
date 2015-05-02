@@ -17,10 +17,10 @@ public class ContactPainter implements Painter
         PrecisePoint pos = translator.TranslatePointOut(element.getPosition());
         double diameter = ((Contact)element).getSize() / 2;
 
-        graphics.setColor(Color.black);
-        graphics.drawOval((int) pos.getX(), (int) pos.getY(), (int) diameter, (int) diameter);
         graphics.setColor(Color.pink);
         graphics.fillOval((int) pos.getX(), (int) pos.getY(), (int) diameter, (int) diameter);
+        graphics.setColor(Color.black);
+        graphics.drawOval((int) pos.getX(), (int) pos.getY(), (int) diameter, (int) diameter);
     }
 
     public boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom)
