@@ -296,12 +296,6 @@ public class JDrawPanel extends JPanel implements ICoordinateTranslator
             }
         }
 
-        PrecisePoint zero = TranslatePointOut(new PrecisePoint());
-
-        //System.out.println(zero.ToString());
-
-        paintMarker(g2d, zero);
-
         //--DrawCenter marker
         PrecisePoint p1 = new PrecisePoint(this.getWidth()/2, this.getHeight()/2 - 5);
         PrecisePoint p2 = new PrecisePoint(this.getWidth()/2, this.getHeight()/2 + 5);
@@ -309,8 +303,6 @@ public class JDrawPanel extends JPanel implements ICoordinateTranslator
         PrecisePoint p4 = new PrecisePoint(this.getWidth()/2 - 5, this.getHeight()/2);
         paintLine(g2d, p1, p2);
         paintLine(g2d, p3, p4);
-
-        //temp comment
 
         PrecisePoint lt = TranslatePointIn(new PrecisePoint());
         PrecisePoint rt = TranslatePointIn(new PrecisePoint(this.getWidth(), this.getHeight()));
@@ -329,5 +321,8 @@ public class JDrawPanel extends JPanel implements ICoordinateTranslator
                 painter.Draw(elem, g2d, this);
             }
         }
+
+        PrecisePoint zero = TranslatePointOut(new PrecisePoint());
+        paintMarker(g2d, zero);
     }
 }
