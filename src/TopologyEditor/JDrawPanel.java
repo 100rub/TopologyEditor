@@ -1,18 +1,26 @@
 package TopologyEditor;
 
+import TopologyEditor.Elements.DefaultPainter;
 import TopologyEditor.Elements.Element;
+import TopologyEditor.TestContent.Elements.Contact;
+import TopologyEditor.Utilities.CoordinateTranslator;
+import TopologyEditor.Utilities.PainterLink;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by 100rub on 14.04.2015.
  */
-public class JDrawPanel extends JPanel
+public class JDrawPanel extends JPanel implements CoordinateTranslator
 {
+    private HashMap<PainterLink, TopologyEditor.Elements.Painter> PainterMap;
+
     private VirtualPane _assignedPane;
     private int _zoomLevel;                 //0 is default
     private double _zoomCoefficient;        //1.0 is default, closer=bigger
@@ -23,8 +31,10 @@ public class JDrawPanel extends JPanel
     private boolean _hasUnsavedChanges;
 
 
-    public JDrawPanel(VirtualPane pane)
+    public JDrawPanel(VirtualPane pane, HashMap<PainterLink, TopologyEditor.Elements.Painter> painterMap)
     {
+        this.PainterMap = painterMap;
+
         if(pane == null)
         {
             _assignedPane = new VirtualPane();
@@ -149,7 +159,7 @@ public class JDrawPanel extends JPanel
 
 
 
-    public PrecisePoint TranslateIn(PrecisePoint pnt)      //translates position from DrawPanel into position on VirtualPane
+    public PrecisePoint TranslatePointIn(PrecisePoint pnt)      //translates position from DrawPanel into position on VirtualPane
     {
         PrecisePoint res = new PrecisePoint();
 
@@ -164,7 +174,7 @@ public class JDrawPanel extends JPanel
 
 
 
-    public PrecisePoint TranslateOut(PrecisePoint pnt)     //translates position from VirtualPane into position on DrawPanel
+    public PrecisePoint TranslatePointOut(PrecisePoint pnt)     //translates position from VirtualPane into position on DrawPanel
     {
         PrecisePoint res = new PrecisePoint();
 
@@ -173,6 +183,28 @@ public class JDrawPanel extends JPanel
         PrecisePoint d = new PrecisePoint(pnt.getX() - _viewPoint.getX(), pnt.getY() - _viewPoint.getY());
         res.setX(_viewPanelCenter.getX() + d.getX()*_zoomCoefficient);
         res.setY(_viewPanelCenter.getY() - d.getY()*_zoomCoefficient);
+
+        return res;
+    }
+
+
+
+    public double TranslateValueIn(double val)
+    {
+        double res = 0;
+
+        res = val / _zoomCoefficient;
+
+        return res;
+    }
+
+
+
+    public double TranslateValueOut(double val)
+    {
+        double res = 0;
+
+        res = val * _zoomCoefficient;
 
         return res;
     }
@@ -200,10 +232,23 @@ public class JDrawPanel extends JPanel
     }
 
 
+    private void paintFigure(Graphics2D g2d, ArrayList<PrecisePoint> list)
+    {
+        //TODO
+        for(int i=0; i<list.size()-1; i++)
+        {
+            PrecisePoint a = list.get(i);
+            PrecisePoint b = list.get(i+1);
+            //g2d.drawLine((int)a.getX(), (int)a.getY(), (int)b.getX(), (int)b.getY());
+        }
+    }
+
 
     private boolean elementIsOnScreen(Element elem)
     {
-        return elem.IsOnScreen(TranslateIn(new PrecisePoint()), TranslateIn(new PrecisePoint(this.getWidth(), this.getHeight())));
+        //TODO fix this
+        //return elem.IsOnScreen(TranslateIn(new PrecisePoint()), TranslateIn(new PrecisePoint(this.getWidth(), this.getHeight())));
+        return true;
     }
 
 
@@ -220,7 +265,7 @@ public class JDrawPanel extends JPanel
 
         //painting grid
         g2d.setColor(new Color(0, 0, 0));
-        PrecisePoint leftTopMostScreenPoint = TranslateIn(new PrecisePoint());
+        PrecisePoint leftTopMostScreenPoint = TranslatePointIn(new PrecisePoint());
 
         //System.out.println("leftTopMostScreenPoint=" + leftTopMostScreenPoint.ToString());
 
@@ -250,11 +295,11 @@ public class JDrawPanel extends JPanel
             for(int j=0; j<y_count; j++)
             {
                 PrecisePoint pnt = new PrecisePoint(leftTopMostGridPoint.getX() + curr_grid_dist*i, leftTopMostGridPoint.getY() - curr_grid_dist*j);
-                paintPoint(g2d, TranslateOut(pnt));
+                paintPoint(g2d, TranslatePointOut(pnt));
             }
         }
 
-        PrecisePoint zero = TranslateOut(new PrecisePoint());
+        PrecisePoint zero = TranslatePointOut(new PrecisePoint());
 
         //System.out.println(zero.ToString());
 
@@ -268,13 +313,23 @@ public class JDrawPanel extends JPanel
         paintLine(g2d, p1, p2);
         paintLine(g2d, p3, p4);
 
-        for(int i=0; i<_assignedPane.getElements().size(); i++)
+
+
+        PrecisePoint lt = TranslatePointIn(new PrecisePoint());
+        PrecisePoint rt = TranslatePointIn(new PrecisePoint(this.getWidth(), this.getHeight()));
+
+        for(Element elem : _assignedPane.getElements())
         {
-            //TODO paint elements properly
-            Element elem = _assignedPane.getElements().get(i);
-            if(elementIsOnScreen(elem))
+            TopologyEditor.Elements.Painter painter = PainterMap.get(new PainterLink("test", Contact.class));
+
+            if(painter == null)
             {
-                paintMarker(g2d, TranslateOut(elem.getPosition()));
+                painter = new DefaultPainter();
+            }
+
+            if(painter.IsOnScreen(elem, lt, rt))
+            {
+                painter.Draw(elem, g2d, this);
             }
         }
     }

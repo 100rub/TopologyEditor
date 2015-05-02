@@ -1,18 +1,21 @@
 import TopologyEditor.DataStoring.XMLHelper;
-import TopologyEditor.Elements.Element;
+import TopologyEditor.Elements.*;
 import TopologyEditor.EventsHandling.ActionHandler;
 import TopologyEditor.EventsHandling.PointTargetedActionParameters;
 import TopologyEditor.JDrawPanel;
 import TopologyEditor.PrecisePoint;
 import TopologyEditor.TestContent.Actions.MoveAction;
 import TopologyEditor.TestContent.Elements.Contact;
+import TopologyEditor.Utilities.PainterLink;
 import TopologyEditor.VirtualPane;
 import javafx.scene.layout.Pane;
 
 import javax.swing.*;
+import javax.swing.Painter;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -20,13 +23,20 @@ import java.util.Random;
  */
 public class MainForm extends JFrame
 {
+    /**
+     * список панелей
+     */
     private ArrayList<JDrawPanel> Panels;
+
+    /**
+     * обработчик событий
+     */
     private ActionHandler handler;
+
+    private HashMap<PainterLink, TopologyEditor.Elements.Painter> PainterMap;
 
     //--Gui elements
     private JPanel rootPanel;
-    private JScrollBar scrollBarVer;
-    private JScrollBar scrollBarHor;
     private JMenuBar MenuBar;
     private JTabbedPane tabbedPane;
     private JPanel PropertiesPanel;
@@ -86,12 +96,21 @@ public class MainForm extends JFrame
 
 
 
+    private void FillPainterMap()
+    {
+        PainterMap.put(new PainterLink("test", Contact.class), new DefaultPainter());
+    }
+
+
+
     public MainForm()
     {
         super("Topology Editor");
 
         Panels = new ArrayList<JDrawPanel>();
         handler = new ActionHandler();
+        PainterMap = new HashMap<PainterLink, TopologyEditor.Elements.Painter>();
+        FillPainterMap();
 
         setContentPane(rootPanel);
         rootPanel.setOpaque(true);
@@ -200,7 +219,7 @@ public class MainForm extends JFrame
         }
         //-----------------
 
-        Panels.add(new JDrawPanel(null));               //creating empty pane for default
+        Panels.add(new JDrawPanel(null, PainterMap));   //creating empty pane for default
         CurrentPanel = Panels.get(Panels.size()-1);     //setting it as current panel
 
         initializeDrawPanelEvents(CurrentPanel);
@@ -217,7 +236,7 @@ public class MainForm extends JFrame
 
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setVisible(true);
+        //setVisible(true);
     }
 
 
@@ -233,7 +252,7 @@ public class MainForm extends JFrame
                     System.out.println("LeftMouseClicked");
                     if(!rightMousePressed)
                     {
-                        SelectedElement = CurrentPanel.SelectElement(CurrentPanel.TranslateIn(new PrecisePoint(e.getX(), e.getY())));
+                        SelectedElement = CurrentPanel.SelectElement(CurrentPanel.TranslatePointIn(new PrecisePoint(e.getX(), e.getY())));
                     }
                 }
 
@@ -356,11 +375,11 @@ public class MainForm extends JFrame
                     }
                 }
 
-                PrecisePoint mousePosInsideBefore = CurrentPanel.TranslateIn(new PrecisePoint(e.getX(), e.getY()));
+                PrecisePoint mousePosInsideBefore = CurrentPanel.TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
 
                 CurrentPanel.setZoomCoefficient(res_zoom_coef);
 
-                PrecisePoint mousePosInsideAfter = CurrentPanel.TranslateIn(new PrecisePoint(e.getX(), e.getY()));
+                PrecisePoint mousePosInsideAfter = CurrentPanel.TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
 
                 PrecisePoint d = new PrecisePoint(mousePosInsideBefore.getX()-mousePosInsideAfter.getX(), mousePosInsideBefore.getY()-mousePosInsideAfter.getY());
 
@@ -485,27 +504,45 @@ public class MainForm extends JFrame
 
     private void Undo(ActionEvent e)
     {
-
+        handler.Undo();
     }
 
 
 
     private void Redo(ActionEvent e)
     {
-
+        handler.Redo();
     }
 
 
 
     private void Settings(ActionEvent e)
     {
-
+        //TODO
     }
 
 
 
     private void UpdateUI()
     {
-        //UndoMenuItem.setEnabled(handler.);
+        //Undo menu
+        if(handler.GetLastAction() != null)
+        {
+            UndoMenuItem.setEnabled(true);
+        }
+        else
+        {
+            UndoMenuItem.setEnabled(false);
+        }
+
+        if(handler.GetLastUndo() != null)
+        {
+            RedoMenuItem.setEnabled(true);
+        }
+        else
+        {
+            RedoMenuItem.setEnabled(false);
+        }
+        CurrentPanel.repaint();
     }
 }
