@@ -21,6 +21,7 @@ public class DefaultPainter implements IPainter
     public boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom)
     {
         PrecisePoint pos = element.getPosition();
+
         return  pos.getX() > leftTop.getX() &&
                 pos.getY() < leftTop.getY() &&
                 pos.getX() < rightBottom.getX() &&

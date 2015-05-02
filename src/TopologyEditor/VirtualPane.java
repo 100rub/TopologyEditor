@@ -51,15 +51,6 @@ public class VirtualPane
 
 
 
-    public Element SelectElement(PrecisePoint point)
-    {
-        Element temp = null;
-
-        return temp;
-    }
-
-
-
     public boolean Save()
     {
         if (_fileName == null)

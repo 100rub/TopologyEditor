@@ -50,21 +50,26 @@ public class JDrawPanel extends JPanel implements ICoordinateTranslator
 
     public void AssignPane(VirtualPane pane)
     {
-        if(_assignedPane != null)
-        {
-            //TODO free memory
-        }
-
         _assignedPane = pane;
     }
 
 
 
-    public Element SelectElement(PrecisePoint pnt)      //point should be in VirtualPane internal coordinates
+    public Element SelectElement(PrecisePoint point)
     {
-        if(_assignedPane != null)
+        for(Element element : _assignedPane.getElements())
         {
-            return _assignedPane.SelectElement(pnt);
+            IPainter painter = PainterMap.get(new PainterLink("test", element.getClass()));
+
+            if(painter == null)
+            {
+                painter = new DefaultPainter();
+            }
+
+            if(painter.IsClicked(element, point))
+            {
+                return element;
+            }
         }
         return null;
     }
@@ -315,18 +320,18 @@ public class JDrawPanel extends JPanel implements ICoordinateTranslator
         PrecisePoint lt = TranslatePointIn(new PrecisePoint());
         PrecisePoint rt = TranslatePointIn(new PrecisePoint(this.getWidth(), this.getHeight()));
 
-        for(Element elem : _assignedPane.getElements())
+        for(Element element : _assignedPane.getElements())
         {
-            IPainter painter = PainterMap.get(new PainterLink("test", elem.getClass()));
+            IPainter painter = PainterMap.get(new PainterLink("test", element.getClass()));
 
             if(painter == null)
             {
                 painter = new DefaultPainter();
             }
 
-            if(painter.IsOnScreen(elem, lt, rt))
+            if(painter.IsOnScreen(element, lt, rt))
             {
-                painter.Draw(elem, g2d, this);
+                painter.Draw(element, g2d, this);
             }
         }
     }
