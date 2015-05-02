@@ -313,7 +313,7 @@ public class JDrawPanel extends JPanel implements CoordinateTranslator
         paintLine(g2d, p1, p2);
         paintLine(g2d, p3, p4);
 
-
+        //temp comment
 
         PrecisePoint lt = TranslatePointIn(new PrecisePoint());
         PrecisePoint rt = TranslatePointIn(new PrecisePoint(this.getWidth(), this.getHeight()));
