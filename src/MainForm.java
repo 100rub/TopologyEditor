@@ -255,6 +255,7 @@ public class MainForm extends JFrame
                     if(!rightMousePressed)
                     {
                         SelectedElement = CurrentPanel.SelectElement(CurrentPanel.TranslatePointIn(new PrecisePoint(e.getX(), e.getY())));
+                        System.out.println("Element clicked");
                     }
                 }
 
