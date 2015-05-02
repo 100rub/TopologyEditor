@@ -1,17 +1,12 @@
-import TopologyEditor.DataStoring.XMLHelper;
 import TopologyEditor.Elements.*;
 import TopologyEditor.EventsHandling.ActionHandler;
-import TopologyEditor.EventsHandling.PointTargetedActionParameters;
 import TopologyEditor.JDrawPanel;
 import TopologyEditor.PrecisePoint;
-import TopologyEditor.TestContent.Actions.MoveAction;
 import TopologyEditor.TestContent.Elements.Contact;
 import TopologyEditor.Utilities.PainterLink;
 import TopologyEditor.VirtualPane;
-import javafx.scene.layout.Pane;
 
 import javax.swing.*;
-import javax.swing.Painter;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -33,7 +28,7 @@ public class MainForm extends JFrame
      */
     private ActionHandler handler;
 
-    private HashMap<PainterLink, TopologyEditor.Elements.Painter> PainterMap;
+    private HashMap<PainterLink, IPainter> PainterMap;
 
     //--Gui elements
     private JPanel rootPanel;
@@ -109,7 +104,7 @@ public class MainForm extends JFrame
 
         Panels = new ArrayList<JDrawPanel>();
         handler = new ActionHandler();
-        PainterMap = new HashMap<PainterLink, TopologyEditor.Elements.Painter>();
+        PainterMap = new HashMap<PainterLink, IPainter>();
         FillPainterMap();
 
         setContentPane(rootPanel);

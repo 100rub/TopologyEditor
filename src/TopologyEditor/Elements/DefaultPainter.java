@@ -1,17 +1,16 @@
 package TopologyEditor.Elements;
 
 import TopologyEditor.PrecisePoint;
-import TopologyEditor.TestContent.Elements.Contact;
-import TopologyEditor.Utilities.CoordinateTranslator;
+import TopologyEditor.Utilities.ICoordinateTranslator;
 
 import java.awt.*;
 
 /**
  * Created by VEF on 5/1/2015.
  */
-public class DefaultPainter implements Painter
+public class DefaultPainter implements IPainter
 {
-    public void Draw(Element element, Graphics2D graphics, CoordinateTranslator translator)
+    public void Draw(Element element, Graphics2D graphics, ICoordinateTranslator translator)
     {
         PrecisePoint pos = translator.TranslatePointOut(element.getPosition());
         graphics.setColor(Color.blue);

@@ -2,24 +2,21 @@ package TopologyEditor;
 
 import TopologyEditor.Elements.DefaultPainter;
 import TopologyEditor.Elements.Element;
-import TopologyEditor.TestContent.Elements.Contact;
-import TopologyEditor.Utilities.CoordinateTranslator;
+import TopologyEditor.Elements.IPainter;
+import TopologyEditor.Utilities.ICoordinateTranslator;
 import TopologyEditor.Utilities.PainterLink;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
  * Created by 100rub on 14.04.2015.
  */
-public class JDrawPanel extends JPanel implements CoordinateTranslator
+public class JDrawPanel extends JPanel implements ICoordinateTranslator
 {
-    private HashMap<PainterLink, TopologyEditor.Elements.Painter> PainterMap;
+    private HashMap<PainterLink, IPainter> PainterMap;
 
     private VirtualPane _assignedPane;
     private int _zoomLevel;                 //0 is default
@@ -31,7 +28,7 @@ public class JDrawPanel extends JPanel implements CoordinateTranslator
     private boolean _hasUnsavedChanges;
 
 
-    public JDrawPanel(VirtualPane pane, HashMap<PainterLink, TopologyEditor.Elements.Painter> painterMap)
+    public JDrawPanel(VirtualPane pane, HashMap<PainterLink, IPainter> painterMap)
     {
         this.PainterMap = painterMap;
 
@@ -320,7 +317,7 @@ public class JDrawPanel extends JPanel implements CoordinateTranslator
 
         for(Element elem : _assignedPane.getElements())
         {
-            TopologyEditor.Elements.Painter painter = PainterMap.get(new PainterLink("test", Contact.class));
+            IPainter painter = PainterMap.get(new PainterLink("test", elem.getClass()));
 
             if(painter == null)
             {

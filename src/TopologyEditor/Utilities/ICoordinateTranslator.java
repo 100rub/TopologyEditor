@@ -5,7 +5,7 @@ import TopologyEditor.PrecisePoint;
 /**
  * Created by VEF on 5/2/2015.
  */
-public interface CoordinateTranslator
+public interface ICoordinateTranslator
 {
     // From graphics to real
     public PrecisePoint TranslatePointIn(PrecisePoint point);

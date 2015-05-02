@@ -1,7 +1,5 @@
 package TopologyEditor.Utilities;
 
-import TopologyEditor.Elements.Painter;
-
 /**
  * Created by 100rub on 03.05.2015.
  */
