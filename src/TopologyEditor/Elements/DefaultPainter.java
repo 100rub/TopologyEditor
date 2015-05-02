@@ -2,6 +2,7 @@ package TopologyEditor.Elements;
 
 import TopologyEditor.PrecisePoint;
 import TopologyEditor.TestContent.Elements.Contact;
+import TopologyEditor.Utilities.CoordinateTranslator;
 
 import java.awt.*;
 
@@ -10,9 +11,11 @@ import java.awt.*;
  */
 public class DefaultPainter implements Painter
 {
-    public void Draw(Element element, Graphics graphics)
+    public void Draw(Element element, Graphics graphics, CoordinateTranslator translator)
     {
-
+        PrecisePoint pos = translator.TranslateOut(element.getPosition());
+        graphics.drawLine((int)pos.getX()-5, (int)pos.getY()-5, (int)pos.getX()+5, (int)pos.getY()+5);
+        graphics.drawLine((int)pos.getX()+5, (int)pos.getY()-5, (int)pos.getX()-5, (int)pos.getY()+5);
     }
 
     public boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom)

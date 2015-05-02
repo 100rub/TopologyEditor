@@ -1,6 +1,8 @@
 package TopologyEditor.Elements;
 
 import TopologyEditor.PrecisePoint;
+import TopologyEditor.Utilities.CoordinateTranslator;
+
 import java.awt.*;
 
 /**
@@ -8,7 +10,7 @@ import java.awt.*;
  */
 public interface Painter
 {
-    public void Draw(Element element, Graphics graphics);
+    public void Draw(Element element, Graphics graphics, CoordinateTranslator translator);
 
     public boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom);
 
