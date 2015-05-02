@@ -3,6 +3,7 @@ import TopologyEditor.EventsHandling.ActionHandler;
 import TopologyEditor.JDrawPanel;
 import TopologyEditor.PrecisePoint;
 import TopologyEditor.TestContent.Elements.Contact;
+import TopologyEditor.TestContent.Elements.ContactPainter;
 import TopologyEditor.Utilities.PainterLink;
 import TopologyEditor.VirtualPane;
 
@@ -93,7 +94,7 @@ public class MainForm extends JFrame
 
     private void FillPainterMap()
     {
-        PainterMap.put(new PainterLink("test", Contact.class), new DefaultPainter());
+        PainterMap.put(new PainterLink("test", Contact.class), new ContactPainter());
     }
 
 

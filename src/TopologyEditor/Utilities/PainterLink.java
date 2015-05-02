@@ -20,7 +20,7 @@ public class PainterLink
         this.Painter = pntr;
     }
 
-    public boolean Equals(Object other)
+    public boolean equals(Object other)
     {
         if (other instanceof PainterLink)
         {
@@ -37,7 +37,7 @@ public class PainterLink
         return false;
     }
 
-    public int HashCode()
+    public int hashCode()
     {
         int hashFirst = DrawMode != null ? DrawMode.hashCode() : 0;
         int hashSecond = Painter != null ? Painter.hashCode() : 0;
