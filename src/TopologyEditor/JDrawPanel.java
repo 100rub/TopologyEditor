@@ -28,6 +28,7 @@ public class JDrawPanel extends JPanel implements ICoordinateTranslator
     private boolean _hasUnsavedChanges;
 
 
+
     public JDrawPanel(VirtualPane pane, HashMap<PainterLink, IPainter> painterMap)
     {
         this.PainterMap = painterMap;
@@ -302,15 +303,11 @@ public class JDrawPanel extends JPanel implements ICoordinateTranslator
         }
 
         //--DrawCenter marker
-        PrecisePoint p1 = new PrecisePoint(this.getWidth()/2, this.getHeight()/2 - 5);
-        PrecisePoint p2 = new PrecisePoint(this.getWidth()/2, this.getHeight()/2 + 5);
-        PrecisePoint p3 = new PrecisePoint(this.getWidth()/2 + 5, this.getHeight()/2);
-        PrecisePoint p4 = new PrecisePoint(this.getWidth()/2 - 5, this.getHeight()/2);
-        paintLine(g2d, p1, p2);
-        paintLine(g2d, p3, p4);
 
         PrecisePoint lt = TranslatePointIn(new PrecisePoint());
         PrecisePoint rt = TranslatePointIn(new PrecisePoint(this.getWidth(), this.getHeight()));
+
+        //System.out.println("Element count: " + _assignedPane.getElements().size());
 
         for(Element element : _assignedPane.getElements())
         {
@@ -323,11 +320,19 @@ public class JDrawPanel extends JPanel implements ICoordinateTranslator
 
             if(painter.IsOnScreen(element, lt, rt))
             {
+                //System.out.println("IsOnScreen");
                 painter.Draw(element, g2d, this);
             }
         }
 
         PrecisePoint zero = TranslatePointOut(new PrecisePoint());
         paintMarker(g2d, zero);
+
+        PrecisePoint p1 = new PrecisePoint(this.getWidth()/2, this.getHeight()/2 - 5);
+        PrecisePoint p2 = new PrecisePoint(this.getWidth()/2, this.getHeight()/2 + 5);
+        PrecisePoint p3 = new PrecisePoint(this.getWidth()/2 + 5, this.getHeight()/2);
+        PrecisePoint p4 = new PrecisePoint(this.getWidth()/2 - 5, this.getHeight()/2);
+        paintLine(g2d, p1, p2);
+        paintLine(g2d, p3, p4);
     }
 }
