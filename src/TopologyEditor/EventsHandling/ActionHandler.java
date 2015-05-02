@@ -1,23 +1,31 @@
 package TopologyEditor.EventsHandling;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Queue;
+import TopologyEditor.EventsHandling.Listeners.IDoListener;
+
+import java.util.*;
 
 /**
  * Created by VEF on 23.04.2015.
  */
 public final class ActionHandler
 {
-    private Queue<ActionInfo> _actions;
-    private Queue<ActionInfo> _undoes;
+    private Stack<ActionInfo> _actions;
+    private Stack<ActionInfo> _undoes;
+
+    private List<IDoListener> _onDo;
+    private List<IDoListener> _onUnDo;
+    private List<IDoListener> _onReDo;
 
 
 
     public ActionHandler()
     {
-        _actions = new LinkedList<ActionInfo>();
-        _undoes = new LinkedList<ActionInfo>();
+        _actions = new Stack<ActionInfo>();
+        _undoes = new Stack<ActionInfo>();
+
+        _onDo = new ArrayList<IDoListener>();
+        _onUnDo = new ArrayList<IDoListener>();
+        _onReDo = new ArrayList<IDoListener>();
     }
 
 
@@ -25,6 +33,10 @@ public final class ActionHandler
     public void Do(Action action, ActionParameters parameters)
     {
         _actions.add(action.Apply(parameters));
+        for (IDoListener listener : _onDo)
+        {
+            listener.OnDo(this, action, parameters);
+        }
         _undoes.clear();
     }
 
@@ -32,8 +44,15 @@ public final class ActionHandler
     {
         if (_actions.isEmpty())
             return false;
-        ActionInfo info = _actions.poll();
-        _undoes.add(info.getOpposite().Apply(info.getParameters()));
+        ActionInfo info = _actions.pop();
+        Action action = info.GetOpposite();
+        ActionParameters parameters = info.GetParameters();
+
+        _undoes.add(action.Apply(parameters));
+        for (IDoListener listener : _onDo)
+        {
+            listener.OnDo(this, action, parameters);
+        }
         return true;
     }
 
@@ -41,8 +60,15 @@ public final class ActionHandler
     {
         if (_undoes.isEmpty())
             return false;
-        ActionInfo info = _undoes.poll();
-        _actions.add(info.getOpposite().Apply(info.getParameters()));
+        ActionInfo info = _undoes.pop();
+        Action action = info.GetOpposite();
+        ActionParameters parameters = info.GetParameters();
+
+        _actions.add(action.Apply(parameters));
+        for (IDoListener listener : _onDo)
+        {
+            listener.OnDo(this, action, parameters);
+        }
         return true;
     }
 
@@ -55,11 +81,28 @@ public final class ActionHandler
 
     public ActionInfo GetLastAction()
     {
-        return _actions.peek();
+        return _actions.isEmpty() ? null : _actions.peek();
     }
 
     public ActionInfo GetLastUndo()
     {
-        return _undoes.peek();
+        return _undoes.isEmpty() ? null : _undoes.peek();
+    }
+
+
+
+    public boolean RegisterDoListener(IDoListener listener)
+    {
+        return _onDo.add(listener);
+    }
+
+    public boolean RegisterUnDoListener(IDoListener listener)
+    {
+        return _onUnDo.add(listener);
+    }
+
+    public boolean RegisterReDoListener(IDoListener listener)
+    {
+        return _onReDo.add(listener);
     }
 }

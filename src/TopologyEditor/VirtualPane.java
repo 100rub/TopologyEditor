@@ -20,8 +20,18 @@ public class VirtualPane
 
     public  VirtualPane()
     {
+        final VirtualPane vp = this;
         _viewPoint = new PrecisePoint();
-        _elements = new ArrayList<Element>();
+        _elements = new ArrayList<Element>()
+        {
+            public boolean add(Element e)
+            {
+                boolean flag = super.add(e);
+                if (flag)
+                    e.SetParent(vp);
+                return flag;
+            }
+        };
         _fileName = null;
     }
 

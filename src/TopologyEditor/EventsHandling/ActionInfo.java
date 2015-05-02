@@ -18,22 +18,22 @@ public final class ActionInfo
     }
 
 
-    public Action getAction()
+    public Action GetAction()
     {
         return _action;
     }
     
-    protected void setAction(Action value)
+    protected void SetAction(Action value)
     {
         _action = value;
     }
 
-    public ActionParameters getParameters()
+    public ActionParameters GetParameters()
     {
         return _parameters;
     }
 
-    public Action getOpposite()
+    public Action GetOpposite()
     {
         return _opposite;
     }

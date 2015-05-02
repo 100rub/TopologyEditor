@@ -8,7 +8,7 @@ public abstract class Action
     protected final ActionInfo Apply(ActionParameters parameters)
     {
         ActionInfo info = ApplyMain(parameters);
-        info.setAction(this);
+        info.SetAction(this);
         return info;
     }
 

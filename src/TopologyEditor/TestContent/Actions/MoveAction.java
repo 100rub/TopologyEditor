@@ -12,19 +12,18 @@ import TopologyEditor.PrecisePoint;
  */
 public class MoveAction extends Action
 {
-    @Override
     public ActionInfo ApplyMain(ActionParameters parameters)
     {
         if (!PointTargetedActionParameters.class.isInstance(parameters))
             throw new IllegalArgumentException("MoveAction accepts only PointTargetedActionParameters as parameters");
 
         PointTargetedActionParameters params = (PointTargetedActionParameters)parameters;
-        Element target = params.getTarget();
+        Element target = params.GetTarget();
 
-        target.getPosition().Shift(params.getPoint());
+        target.getPosition().Shift(params.GetPoint());
 
-        PrecisePoint newPoint = new PrecisePoint(-params.getPoint().getX(), -params.getPoint().getY());
-        PointTargetedActionParameters newParams = new PointTargetedActionParameters(parameters.getTarget(), newPoint);
+        PrecisePoint newPoint = new PrecisePoint(-params.GetPoint().getX(), -params.GetPoint().getY());
+        PointTargetedActionParameters newParams = new PointTargetedActionParameters(parameters.GetTarget(), newPoint);
         return new ActionInfo(this, newParams);
     }
 }

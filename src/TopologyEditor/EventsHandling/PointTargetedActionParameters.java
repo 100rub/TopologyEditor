@@ -20,7 +20,7 @@ public class PointTargetedActionParameters extends ActionParameters
 
 
 
-    public PrecisePoint getPoint() {
+    public PrecisePoint GetPoint() {
         return _point;
     }
 }

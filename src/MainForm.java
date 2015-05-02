@@ -1,7 +1,12 @@
 import TopologyEditor.Elements.*;
-import TopologyEditor.EventsHandling.ActionHandler;
+import TopologyEditor.EventsHandling.*;
+import TopologyEditor.EventsHandling.Action;
+import TopologyEditor.EventsHandling.Listeners.IDoListener;
 import TopologyEditor.JDrawPanel;
 import TopologyEditor.PrecisePoint;
+import TopologyEditor.TestContent.Actions.AddElementAction;
+import TopologyEditor.TestContent.Actions.AddElementParameters;
+import TopologyEditor.TestContent.Actions.RemoveElementAction;
 import TopologyEditor.TestContent.Elements.Contact;
 import TopologyEditor.TestContent.Elements.ContactPainter;
 import TopologyEditor.Utilities.PainterLink;
@@ -104,6 +109,22 @@ public class MainForm extends JFrame
 
 
 
+    private void InitHandler()
+    {
+        IDoListener listener = new IDoListener()
+        {
+            public void OnDo(ActionHandler handler, Action action, ActionParameters params)
+            {
+                UpdateUI();
+            }
+        };
+        handler.RegisterDoListener(listener);
+        handler.RegisterReDoListener(listener);
+        handler.RegisterUnDoListener(listener);
+    }
+
+
+
     public MainForm()
     {
         super("Topology Editor");
@@ -111,7 +132,6 @@ public class MainForm extends JFrame
         currDir = Paths.get(".").toAbsolutePath().normalize().toString();
 
         Panels = new ArrayList<JDrawPanel>();
-        handler = new ActionHandler();
         PainterMap = new HashMap<PainterLink, IPainter>();
         FillPainterMap();
 
@@ -130,10 +150,9 @@ public class MainForm extends JFrame
 
             NewMenuItem = new JMenuItem("New");
             FileMenu.add(NewMenuItem);
-            NewMenuItem.addActionListener(new ActionListener()
-            {
-                public void actionPerformed(ActionEvent e)
-                {
+            NewMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            NewMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
                     //System.out.println("NewMenuItem Clicked");
                     New(e);
                 }
@@ -141,6 +160,7 @@ public class MainForm extends JFrame
 
             OpenMenuItem = new JMenuItem("Open");
             FileMenu.add(OpenMenuItem);
+            OpenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             OpenMenuItem.addActionListener(new ActionListener()
             {
                 public void actionPerformed(ActionEvent e)
@@ -152,6 +172,7 @@ public class MainForm extends JFrame
 
             SaveMenuItem = new JMenuItem("Save");
             FileMenu.add(SaveMenuItem);
+            SaveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             SaveMenuItem.addActionListener(new ActionListener()
             {
                 public void actionPerformed(ActionEvent e)
@@ -163,6 +184,7 @@ public class MainForm extends JFrame
 
             SaveAsMenuItem = new JMenuItem("Save As");
             FileMenu.add(SaveAsMenuItem);
+            SaveAsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             SaveAsMenuItem.addActionListener(new ActionListener()
             {
                 public void actionPerformed(ActionEvent e)
@@ -179,7 +201,7 @@ public class MainForm extends JFrame
                 public void actionPerformed(ActionEvent e)
                 {
                     //System.out.println("SaveAsMenuItem Clicked");
-                    //SaveAs(e);
+                    Exit(e);
                 }
             });
         }
@@ -192,6 +214,7 @@ public class MainForm extends JFrame
 
             UndoMenuItem = new JMenuItem("Undo");
             EditMenu.add(UndoMenuItem);
+            UndoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             UndoMenuItem.addActionListener(new ActionListener()
             {
                 public void actionPerformed(ActionEvent e)
@@ -203,6 +226,7 @@ public class MainForm extends JFrame
 
             RedoMenuItem = new JMenuItem("Redo");
             EditMenu.add(RedoMenuItem);
+            RedoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
             RedoMenuItem.addActionListener(new ActionListener()
             {
                 public void actionPerformed(ActionEvent e)
@@ -246,11 +270,7 @@ public class MainForm extends JFrame
 
         //loadTestData();     //TODO REMOVE
 
-        UpdateUI();
-
-        pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //setVisible(true);
     }
 
 
@@ -268,18 +288,18 @@ public class MainForm extends JFrame
                     {
                         PrecisePoint clickPosition = CurrentPanel.TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
                         SelectedElement = CurrentPanel.SelectElement(clickPosition);
-                        if (SelectedElement != null)
+
+                        if (SelectedElement == null)
                         {
-                            System.out.println("Element clicked");
+                            Contact c = new Contact();
+                            c.setSize(Math.random() * 15 + 5);
+                            handler.Do(new AddElementAction(), new AddElementParameters(c, clickPosition, CurrentPanel.getPane()));
+                            CurrentPanel.repaint();
                         }
                         else
                         {
-                            System.out.println("Element added");
-                            Contact c = new Contact();
-                            c.setSize(Math.random() * 15 + 5);
-                            c.setPosition(clickPosition);
-                            CurrentPanel.getPane().getElements().add(c);
-                            UpdateUI();
+                            handler.Do(new RemoveElementAction(), new ActionParameters(SelectedElement));
+                            CurrentPanel.repaint();
                         }
                     }
                 }
@@ -287,7 +307,7 @@ public class MainForm extends JFrame
                 if(e.getButton() == MouseEvent.BUTTON3)     //right mouse button
                 {
                     System.out.println("RightMouseClicked");
-                    if(!leftMousePressed)
+                    if (!leftMousePressed)
                     {
 
                     }
@@ -555,6 +575,13 @@ public class MainForm extends JFrame
 
 
 
+    private void Exit(ActionEvent e)
+    {
+        System.exit(0);
+    }
+
+
+
     private void UpdateUI()
     {
         //Undo menu
@@ -576,5 +603,19 @@ public class MainForm extends JFrame
             RedoMenuItem.setEnabled(false);
         }
         CurrentPanel.repaint();
+    }
+
+
+
+    public void Show()
+    {
+        handler = new ActionHandler();
+        InitHandler();
+
+
+        UpdateUI();
+
+        pack();
+        setVisible(true);
     }
 }
