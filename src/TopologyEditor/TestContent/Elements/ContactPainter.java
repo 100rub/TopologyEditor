@@ -15,7 +15,7 @@ public class ContactPainter implements IPainter
     public void Draw(Element element, Graphics2D graphics, ICoordinateTranslator translator)
     {
         PrecisePoint pos = translator.TranslatePointOut(element.getPosition());
-        double diameter = ((Contact)element).getSize() / 2;
+        double diameter = translator.TranslateValueOut(((Contact)element).getSize());
 
         graphics.setColor(Color.pink);
         graphics.fillOval((int) pos.getX(), (int) pos.getY(), (int) diameter, (int) diameter);
