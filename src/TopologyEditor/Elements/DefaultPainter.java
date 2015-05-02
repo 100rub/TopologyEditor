@@ -13,7 +13,7 @@ public class DefaultPainter implements Painter
 {
     public void Draw(Element element, Graphics graphics, CoordinateTranslator translator)
     {
-        PrecisePoint pos = translator.TranslateOut(element.getPosition());
+        PrecisePoint pos = translator.TranslatePointOut(element.getPosition());
         graphics.drawLine((int)pos.getX()-5, (int)pos.getY()-5, (int)pos.getX()+5, (int)pos.getY()+5);
         graphics.drawLine((int)pos.getX()+5, (int)pos.getY()-5, (int)pos.getX()-5, (int)pos.getY()+5);
     }
