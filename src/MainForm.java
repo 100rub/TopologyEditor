@@ -99,7 +99,7 @@ public class MainForm extends JFrame
 
     private void FillPainterMap()
     {
-        //PainterMap.put(new PainterLink("test", Contact.class), new ContactPainter());
+        PainterMap.put(new PainterLink("test", Contact.class), new ContactPainter());
     }
 
 
@@ -274,14 +274,12 @@ public class MainForm extends JFrame
                         }
                         else
                         {
-                            /*
                             System.out.println("Element added");
                             Contact c = new Contact();
                             c.setSize(Math.random() * 15 + 5);
                             c.setPosition(clickPosition);
                             CurrentPanel.getPane().getElements().add(c);
                             UpdateUI();
-                            */
                         }
                     }
                 }

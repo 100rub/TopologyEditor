@@ -16,25 +16,32 @@ public class ContactPainter implements IPainter
     {
         PrecisePoint pos = translator.TranslatePointOut(element.getPosition());
         double diameter = translator.TranslateValueOut(((Contact)element).getSize());
+        int x = (int)(pos.getX() - diameter / 2);
+        int y = (int)(pos.getY() - diameter / 2);
 
         graphics.setColor(Color.pink);
-        graphics.fillOval((int) pos.getX(), (int) pos.getY(), (int) diameter, (int) diameter);
+        graphics.fillOval(x, y, (int)diameter, (int)diameter);
         graphics.setColor(Color.black);
-        graphics.drawOval((int) pos.getX(), (int) pos.getY(), (int) diameter, (int) diameter);
+        graphics.drawOval(x, y, (int)diameter, (int)diameter);
     }
 
     public boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom)
     {
         PrecisePoint pos = element.getPosition();
-        double x = pos.getX();
-        double y = pos.getY();
-        double size = ((Contact)element).getSize();
 
-        return  x * x + y * y <= size * size;
+        return  pos.getX() > leftTop.getX() &&
+                pos.getY() < leftTop.getY() &&
+                pos.getX() < rightBottom.getX() &&
+                pos.getY() > rightBottom.getY();
     }
 
     public boolean IsClicked(Element element, PrecisePoint point)
     {
-        return IsOnScreen(element, point, point);
+        PrecisePoint pos = element.getPosition();
+        double x = pos.getX() - point.getX();
+        double y = pos.getY() - point.getY();
+        double size = ((Contact)element).getSize();
+
+        return  x * x + y * y <= size * size;
     }
 }
