@@ -254,8 +254,20 @@ public class MainForm extends JFrame
                     System.out.println("LeftMouseClicked");
                     if(!rightMousePressed)
                     {
-                        SelectedElement = CurrentPanel.SelectElement(CurrentPanel.TranslatePointIn(new PrecisePoint(e.getX(), e.getY())));
-                        System.out.println("Element clicked");
+                        PrecisePoint clickPosition = CurrentPanel.TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
+                        SelectedElement = CurrentPanel.SelectElement(clickPosition);
+                        if (SelectedElement != null)
+                        {
+                            System.out.println("Element clicked");
+                        }
+                        else
+                        {
+                            Contact c = new Contact();
+                            c.setSize(Math.random() * 15 + 5);
+                            c.setPosition(clickPosition);
+                            CurrentPanel.getPane().getElements().add(c);
+                            CurrentPanel.repaint();
+                        }
                     }
                 }
 
