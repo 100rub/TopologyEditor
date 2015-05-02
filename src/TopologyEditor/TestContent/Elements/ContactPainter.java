@@ -14,9 +14,10 @@ public class ContactPainter implements Painter
 {
     public void Draw(Element element, Graphics graphics, CoordinateTranslator translator)
     {
-        PrecisePoint pos = translator.TranslateOut(element.getPosition());
-        graphics.drawLine((int)pos.getX()-5, (int)pos.getY()-5, (int)pos.getX()+5, (int)pos.getY()+5);
-        graphics.drawLine((int)pos.getX()+5, (int)pos.getY()-5, (int)pos.getX()-5, (int)pos.getY()+5);
+        PrecisePoint pos = translator.TranslatePointOut(element.getPosition());
+        double diameter = ((Contact)element).getSize() / 2;
+
+        graphics.drawOval((int)pos.getX(), (int)pos.getY(), (int)diameter, (int)diameter);
     }
 
     public boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom)

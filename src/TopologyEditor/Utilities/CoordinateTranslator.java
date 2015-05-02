@@ -8,8 +8,14 @@ import TopologyEditor.PrecisePoint;
 public interface CoordinateTranslator
 {
     // From graphics to real
-    public PrecisePoint TranslateIn(PrecisePoint pnt);
+    public PrecisePoint TranslatePointIn(PrecisePoint point);
 
     // From real to graphics
-    public PrecisePoint TranslateOut(PrecisePoint pnt);
+    public PrecisePoint TranslatePointOut(PrecisePoint point);
+
+    // From real to graphics
+    public double TranslateValueIn(double value);
+
+    // From real to graphics
+    public double TranslateValueOut(double value);
 }
