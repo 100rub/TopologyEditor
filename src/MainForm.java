@@ -10,6 +10,8 @@ import TopologyEditor.VirtualPane;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -61,6 +63,8 @@ public class MainForm extends JFrame
 
     private Element SelectedElement;
 
+    private String currDir;
+
     public void loadTestData()      //TODO remove
     {
         Random r = new Random();
@@ -102,6 +106,8 @@ public class MainForm extends JFrame
     public MainForm()
     {
         super("Topology Editor");
+
+        currDir = Paths.get(".").toAbsolutePath().normalize().toString();
 
         Panels = new ArrayList<JDrawPanel>();
         handler = new ActionHandler();
@@ -442,6 +448,7 @@ public class MainForm extends JFrame
             if(returnVal == JOptionPane.YES_OPTION)
             {
                 final JFileChooser fc = new JFileChooser();
+                fc.setCurrentDirectory(new File(currDir));
                 int result = fc.showOpenDialog(rootPanel);
                 if (result == JFileChooser.APPROVE_OPTION)
                 {
@@ -452,6 +459,7 @@ public class MainForm extends JFrame
         else
         {
             final JFileChooser fc = new JFileChooser();
+            fc.setCurrentDirectory(new File(currDir));
             int result = fc.showOpenDialog(rootPanel);
             if (result == JFileChooser.APPROVE_OPTION)
             {
@@ -468,6 +476,7 @@ public class MainForm extends JFrame
         if(!CurrentPanel.getPane().Save())
         {
             final JFileChooser fc = new JFileChooser();
+            fc.setCurrentDirectory(new File(currDir));
             int returnVal = fc.showSaveDialog(rootPanel);
             if (returnVal == JFileChooser.APPROVE_OPTION)
             {
@@ -487,6 +496,7 @@ public class MainForm extends JFrame
     private void SaveAs(ActionEvent e)
     {
         final JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(new File(currDir));
         int returnVal = fc.showSaveDialog(rootPanel);
         if (returnVal == JFileChooser.APPROVE_OPTION)
         {
