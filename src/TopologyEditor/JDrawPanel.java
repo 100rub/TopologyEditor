@@ -14,7 +14,7 @@ import java.util.HashMap;
 /**
  * Created by 100rub on 14.04.2015.
  */
-public class JDrawPanel extends JPanel implements ICoordinateTranslator
+public class JDrawPanel extends JPanel
 {
     private HashMap<PainterLink, IPainter> PainterMap;
 
@@ -321,7 +321,25 @@ public class JDrawPanel extends JPanel implements ICoordinateTranslator
             if(painter.IsOnScreen(element, lt, rt))
             {
                 //System.out.println("IsOnScreen");
-                painter.Draw(element, g2d, this);
+                final JDrawPanel jdp = this;
+                painter.Draw(element, g2d, new ICoordinateTranslator()
+                {
+                    public PrecisePoint TranslatePointIn(PrecisePoint point) {
+                        return jdp.TranslatePointIn(point);
+                    }
+
+                    public PrecisePoint TranslatePointOut(PrecisePoint point) {
+                        return jdp.TranslatePointOut(point);
+                    }
+
+                    public double TranslateValueIn(double value) {
+                        return jdp.TranslateValueIn(value);
+                    }
+
+                    public double TranslateValueOut(double value) {
+                        return jdp.TranslateValueOut(value);
+                    }
+                });
             }
         }
 

@@ -115,12 +115,25 @@ public class MainForm extends JFrame
         {
             public void OnDo(ActionHandler handler, Action action, ActionParameters params)
             {
+                CurrentPanel.setHasUnsavedChanges(true);
                 UpdateUI();
             }
         };
         handler.RegisterDoListener(listener);
-        handler.RegisterReDoListener(listener);
-        handler.RegisterUnDoListener(listener);
+        handler.RegisterReDoListener(new IDoListener()
+        {
+            public void OnDo(ActionHandler handler, Action action, ActionParameters params)
+            {
+                UpdateUI();
+            }
+        });
+        handler.RegisterUnDoListener(new IDoListener()
+        {
+            public void OnDo(ActionHandler handler, Action action, ActionParameters params)
+            {
+                UpdateUI();
+            }
+        });
     }
 
 
