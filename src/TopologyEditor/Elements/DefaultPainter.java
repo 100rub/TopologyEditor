@@ -16,17 +16,17 @@ public class DefaultPainter implements IPainter
         graphics.setColor(Color.blue);
         graphics.drawLine((int)pos.getX()-5, (int)pos.getY()-5, (int)pos.getX()+5, (int)pos.getY()+5);
         graphics.drawLine((int)pos.getX()+5, (int)pos.getY()-5, (int)pos.getX()-5, (int)pos.getY()+5);
-        graphics.drawString(element.GetName(), (int)pos.getX()-5, (int)pos.getY()+10);
+        graphics.drawString(element.GetName(), (int)pos.getX()-5, (int)pos.getY()+15);
     }
 
     public boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom)
     {
         PrecisePoint pos = element.getPosition();
 
-        return  pos.getX() > leftTop.getX() &&
-                pos.getY() < leftTop.getY() &&
-                pos.getX() < rightBottom.getX() &&
-                pos.getY() > rightBottom.getY();
+        return  pos.getX() - 5 > leftTop.getX() &&
+                pos.getY() + 5 < leftTop.getY() &&
+                pos.getX() + 5 < rightBottom.getX() &&
+                pos.getY() - 5 > rightBottom.getY();
     }
 
     public boolean IsClicked(Element element, PrecisePoint point)

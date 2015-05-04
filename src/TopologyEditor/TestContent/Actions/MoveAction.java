@@ -16,9 +16,6 @@ public class MoveAction extends Action
 
     public ActionInfo ApplyMain(ActionParameters parameters)
     {
-        if (!PointTargetedActionParameters.class.isInstance(parameters))
-            throw new IllegalArgumentException("MoveAction accepts only PointTargetedActionParameters as parameters");
-
         PointTargetedActionParameters params = (PointTargetedActionParameters)parameters;
         Element target = params.GetTarget();
 

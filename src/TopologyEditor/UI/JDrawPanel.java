@@ -26,6 +26,8 @@ public class JDrawPanel extends JPanel
     private PrecisePoint _viewPoint;
     private PrecisePoint _viewPanelCenter;
     private int gridPointsDistance = 20;
+    private ICoordinateTranslator _coordTranslator;
+    private String _drawMode;
 
     private boolean _hasUnsavedChanges;
 
@@ -56,6 +58,13 @@ public class JDrawPanel extends JPanel
     public void AssignPane(VirtualPane pane)
     {
         _assignedPane = pane;
+    }
+
+
+
+    public void SetDrawMode(String value)
+    {
+        _drawMode = value;
     }
 
 
@@ -166,7 +175,36 @@ public class JDrawPanel extends JPanel
 
 
 
-    public PrecisePoint TranslatePointIn(PrecisePoint pnt)      //translates position from DrawPanel into position on VirtualPane
+    public ICoordinateTranslator GetTranslator()
+    {
+        if (_coordTranslator == null)
+        {
+            final JDrawPanel jdp = this;
+            _coordTranslator = new ICoordinateTranslator()
+            {
+                public PrecisePoint TranslatePointIn(PrecisePoint point) {
+                    return jdp.TranslatePointIn(point);
+                }
+
+                public PrecisePoint TranslatePointOut(PrecisePoint point) {
+                    return jdp.TranslatePointOut(point);
+                }
+
+                public double TranslateValueIn(double value) {
+                    return jdp.TranslateValueIn(value);
+                }
+
+                public double TranslateValueOut(double value) {
+                    return jdp.TranslateValueOut(value);
+                }
+            };
+        }
+        return _coordTranslator;
+    }
+
+
+
+    private PrecisePoint TranslatePointIn(PrecisePoint pnt)      //translates position from DrawPanel into position on VirtualPane
     {
         PrecisePoint res = new PrecisePoint();
 
@@ -181,7 +219,7 @@ public class JDrawPanel extends JPanel
 
 
 
-    public PrecisePoint TranslatePointOut(PrecisePoint pnt)     //translates position from VirtualPane into position on DrawPanel
+    private PrecisePoint TranslatePointOut(PrecisePoint pnt)     //translates position from VirtualPane into position on DrawPanel
     {
         PrecisePoint res = new PrecisePoint();
 
@@ -196,24 +234,16 @@ public class JDrawPanel extends JPanel
 
 
 
-    public double TranslateValueIn(double val)
+    private double TranslateValueIn(double val)
     {
-        double res = 0;
-
-        res = val / _zoomCoefficient;
-
-        return res;
+        return val / _zoomCoefficient;
     }
 
 
 
-    public double TranslateValueOut(double val)
+    private double TranslateValueOut(double val)
     {
-        double res = 0;
-
-        res = val * _zoomCoefficient;
-
-        return res;
+        return val * _zoomCoefficient;
     }
 
 
@@ -319,7 +349,7 @@ public class JDrawPanel extends JPanel
 
         for(Element element : _assignedPane.getElements())
         {
-            IPainter painter = PainterMap.get(new PainterLink("test", element.getClass()));
+            IPainter painter = PainterMap.get(new PainterLink(_drawMode, element.getClass()));
 
             if(painter == null)
             {
@@ -328,26 +358,7 @@ public class JDrawPanel extends JPanel
 
             if(painter.IsOnScreen(element, lt, rt))
             {
-                //System.out.println("IsOnScreen");
-                final JDrawPanel jdp = this;
-                painter.Draw(element, g2d, new ICoordinateTranslator()
-                {
-                    public PrecisePoint TranslatePointIn(PrecisePoint point) {
-                        return jdp.TranslatePointIn(point);
-                    }
-
-                    public PrecisePoint TranslatePointOut(PrecisePoint point) {
-                        return jdp.TranslatePointOut(point);
-                    }
-
-                    public double TranslateValueIn(double value) {
-                        return jdp.TranslateValueIn(value);
-                    }
-
-                    public double TranslateValueOut(double value) {
-                        return jdp.TranslateValueOut(value);
-                    }
-                });
+                painter.Draw(element, g2d, GetTranslator());
             }
         }
 

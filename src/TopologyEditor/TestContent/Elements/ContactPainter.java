@@ -42,6 +42,6 @@ public class ContactPainter implements IPainter
         double y = pos.getY() - point.getY();
         double size = ((Contact)element).getSize();
 
-        return  x * x + y * y <= size * size;
+        return  x*x + y*y <= size*size/4;
     }
 }

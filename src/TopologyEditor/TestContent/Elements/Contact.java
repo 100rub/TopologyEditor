@@ -8,6 +8,7 @@ import TopologyEditor.Elements.Element;
 public class Contact extends Element
 {
     private double _size;
+    private double _innerSize;
 
 
 
@@ -19,6 +20,16 @@ public class Contact extends Element
     public void setSize(double value)
     {
         _size = value;
+    }
+
+    public double getInnerSize()
+    {
+        return _innerSize;
+    }
+
+    public void setInnerSize(double value)
+    {
+        _innerSize = value;
     }
 
     public String GetName()

@@ -1,5 +1,8 @@
 package TopologyEditor.TestContent;
 
+import TopologyEditor.TestContent.Elements.Contact;
+import TopologyEditor.TestContent.Elements.ContactPainter;
+import TopologyEditor.TestContent.Elements.ContactRealPainter;
 import TopologyEditor.UI.MainForm;
 
 /**
@@ -10,6 +13,9 @@ public class Main
     public static void main(String[] args)
     {
         MainForm mainForm = new MainForm();
+        mainForm.AddPainter("Scetch", Contact.class, new ContactPainter());
+        mainForm.AddPainter("Topology", Contact.class, new ContactRealPainter());
+        mainForm.SetDrawMode("Scetch");
         mainForm.Show();
     }
 }

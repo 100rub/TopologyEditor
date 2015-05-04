@@ -18,6 +18,8 @@ import TopologyEditor.Elements.VirtualPane;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ public class MainForm extends JFrame
      */
     private ActionHandler handler;
 
+    private ArrayList<String> drawModes;
     private HashMap<PainterLink, IPainter> PainterMap;
 
     //--Gui elements
@@ -46,6 +49,7 @@ public class MainForm extends JFrame
     private JMenuBar MenuBar;
     private JTabbedPane tabbedPane;
     private JPanel PropertiesPanel;
+    private JComboBox cbDrawMode;
 
     private JMenu FileMenu;
     private JMenu EditMenu;
@@ -105,13 +109,6 @@ public class MainForm extends JFrame
 
 
 
-    private void FillPainterMap()
-    {
-        PainterMap.put(new PainterLink("test", Contact.class), new ContactPainter());
-    }
-
-
-
     private void InitHandler()
     {
         IDoListener listener = new IDoListener()
@@ -141,8 +138,10 @@ public class MainForm extends JFrame
         currDir = Paths.get(".").toAbsolutePath().normalize().toString();
 
         Panels = new ArrayList<JDrawPanel>();
+        drawModes = new ArrayList<String>();
         PainterMap = new HashMap<PainterLink, IPainter>();
-        FillPainterMap();
+        drawModes.add("Debug");
+        cbDrawMode.addItem("Debug");
 
         setContentPane(rootPanel);
         rootPanel.setOpaque(true);
@@ -270,6 +269,17 @@ public class MainForm extends JFrame
         Panels.add(CurrentPanel);
 
         initializeDrawPanelEvents(CurrentPanel);
+        cbDrawMode.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e)
+            {
+                if (e.getStateChange() == ItemEvent.SELECTED)
+                {
+                    for (JDrawPanel jdp : Panels)
+                        jdp.SetDrawMode(drawModes.get(cbDrawMode.getSelectedIndex()));
+                    CurrentPanel.repaint();
+                }
+            }
+        });
 
         tabbedPane.add(CurrentPanel, BorderLayout.CENTER);
         tabbedPane.removeTabAt(0);
@@ -295,13 +305,14 @@ public class MainForm extends JFrame
                     System.out.println("LeftMouseClicked");
                     if(!rightMousePressed)
                     {
-                        PrecisePoint clickPosition = CurrentPanel.TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
+                        PrecisePoint clickPosition = CurrentPanel.GetTranslator().TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
                         SelectedElement = CurrentPanel.SelectElement(clickPosition);
 
                         if (SelectedElement == null)
                         {
                             Contact c = new Contact();
                             c.setSize(Math.random() * 15 + 5);
+                            c.setInnerSize(Math.random() * ((c.getSize() - 4) * .8) + 4);
                             handler.Do(new AddElementAction(), new AddElementParameters(c, clickPosition, CurrentPanel.getPane()));
                             CurrentPanel.repaint();
                         }
@@ -363,8 +374,8 @@ public class MainForm extends JFrame
                     }
                     else
                     {
-                        PrecisePoint clickPosition = CurrentPanel.TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
-                        PrecisePoint elementPosition = CurrentPanel.TranslatePointIn(mouseDownPosition);
+                        PrecisePoint clickPosition = CurrentPanel.GetTranslator().TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
+                        PrecisePoint elementPosition = CurrentPanel.GetTranslator().TranslatePointIn(mouseDownPosition);
                         SelectedElement = CurrentPanel.SelectElement(elementPosition);
 
                         if (SelectedElement != null)
@@ -438,11 +449,11 @@ public class MainForm extends JFrame
                     }
                 }
 
-                PrecisePoint mousePosInsideBefore = CurrentPanel.TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
+                PrecisePoint mousePosInsideBefore = CurrentPanel.GetTranslator().TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
 
                 CurrentPanel.setZoomCoefficient(res_zoom_coef);
 
-                PrecisePoint mousePosInsideAfter = CurrentPanel.TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
+                PrecisePoint mousePosInsideAfter = CurrentPanel.GetTranslator().TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
 
                 PrecisePoint d = new PrecisePoint(mousePosInsideBefore.getX()-mousePosInsideAfter.getX(), mousePosInsideBefore.getY()-mousePosInsideAfter.getY());
 
@@ -644,5 +655,25 @@ public class MainForm extends JFrame
 
         pack();
         setVisible(true);
+    }
+
+
+
+    public void AddPainter(String drawMode, Class elementType, IPainter painter)
+    {
+        if (!drawModes.contains(drawMode))
+        {
+            drawModes.add(drawMode);
+            cbDrawMode.addItem(drawMode);
+        }
+        PainterMap.put(new PainterLink(drawMode, elementType), painter);
+    }
+
+
+
+    public void SetDrawMode(String value)
+    {
+        if (drawModes.contains(value))
+            cbDrawMode.setSelectedItem(value);
     }
 }
