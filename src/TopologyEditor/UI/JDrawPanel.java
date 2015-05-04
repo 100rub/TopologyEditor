@@ -358,26 +358,23 @@ public class JDrawPanel extends JPanel
 
             if(painter.IsOnScreen(element, lt, rt))
             {
-                painter.Draw(element, g2d, GetTranslator());
+                painter.Draw(element, (Graphics2D)g2d.create(), GetTranslator());
             }
         }
 
+        Stroke stroke = g2d.getStroke();
+        g2d.setStroke(dashedStroke);
         if (zero.getX() > 0 && zero.getX() < this.getWidth())
         {
             g2d.setColor(Color.blue);
-            Stroke stroke = g2d.getStroke();
-            g2d.setStroke(dashedStroke);
             paintLine(g2d, new PrecisePoint(zero.getX(), zero.getY() % 20), new PrecisePoint(zero.getX(), this.getHeight()));
-            g2d.setStroke(stroke);
         }
         if (zero.getY() > 0 && zero.getY() < this.getHeight())
         {
             g2d.setColor(Color.red);
-            Stroke stroke = g2d.getStroke();
-            g2d.setStroke(dashedStroke);
             paintLine(g2d, new PrecisePoint(zero.getX() % 20, zero.getY()), new PrecisePoint(this.getWidth(), zero.getY()));
-            g2d.setStroke(stroke);
         }
+        g2d.setStroke(stroke);
 
         PrecisePoint p1 = new PrecisePoint(this.getWidth()/2, this.getHeight()/2 - 5);
         PrecisePoint p2 = new PrecisePoint(this.getWidth()/2, this.getHeight()/2 + 5);

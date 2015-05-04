@@ -43,10 +43,8 @@ public class ContactRealPainter implements IPainter
         DrawRect(graphics, pos, size);
 
         graphics.setColor(Color.pink);
-        Stroke stroke = graphics.getStroke();
         graphics.setStroke(dashedStroke);
         DrawRect(graphics, pos, innerSize);
-        graphics.setStroke(stroke);
     }
 
     public boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom)

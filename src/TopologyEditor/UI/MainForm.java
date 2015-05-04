@@ -302,7 +302,7 @@ public class MainForm extends JFrame
             {
                 if(e.getButton() == MouseEvent.BUTTON1)     //left mouse button
                 {
-                    System.out.println("LeftMouseClicked");
+                    //System.out.println("LeftMouseClicked");
                     if(!rightMousePressed)
                     {
                         PrecisePoint clickPosition = CurrentPanel.GetTranslator().TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
@@ -326,7 +326,7 @@ public class MainForm extends JFrame
 
                 if(e.getButton() == MouseEvent.BUTTON3)     //right mouse button
                 {
-                    System.out.println("RightMouseClicked");
+                    //System.out.println("RightMouseClicked");
                     if (!leftMousePressed)
                     {
 
@@ -349,7 +349,7 @@ public class MainForm extends JFrame
                 if(e.getButton() == MouseEvent.BUTTON1)     //left mouse button
                 {
                     leftMousePressed = true;
-                    System.out.println("LeftMousePressed");
+                    //System.out.println("LeftMousePressed");
 
                     mouseDownPosition = new PrecisePoint(e.getX(), e.getY());
                 }
@@ -367,7 +367,7 @@ public class MainForm extends JFrame
                 if(e.getButton() == MouseEvent.BUTTON1)
                 {
                     leftMousePressed = false;
-                    System.out.println("LeftMouseReleased");
+                    //System.out.println("LeftMouseReleased");
                     if(rightMousePressed)
                     {
                         previousMousePosition = new PrecisePoint(e.getX(), e.getY());
