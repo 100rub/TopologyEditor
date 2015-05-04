@@ -1,10 +1,12 @@
-package TopologyEditor;
+package TopologyEditor.UI;
 
 import TopologyEditor.Elements.DefaultPainter;
 import TopologyEditor.Elements.Element;
 import TopologyEditor.Elements.IPainter;
+import TopologyEditor.Elements.VirtualPane;
 import TopologyEditor.Utilities.ICoordinateTranslator;
 import TopologyEditor.Utilities.PainterLink;
+import TopologyEditor.Utilities.PrecisePoint;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,6 +28,8 @@ public class JDrawPanel extends JPanel
     private int gridPointsDistance = 20;
 
     private boolean _hasUnsavedChanges;
+
+    private final static BasicStroke dashedStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] {10.0f}, 0.0f);
 
 
 
@@ -247,21 +251,13 @@ public class JDrawPanel extends JPanel
     }
 
 
-    private boolean elementIsOnScreen(Element elem)
-    {
-        //TODO fix this
-        //return elem.IsOnScreen(TranslateIn(new PrecisePoint()), TranslateIn(new PrecisePoint(this.getWidth(), this.getHeight())));
-        return true;
-    }
-
-
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
 
         _viewPanelCenter = new PrecisePoint(this.getWidth()/2, this.getHeight()/2);
 
-        Graphics2D g2d = (Graphics2D) g;
+        Graphics2D g2d = (Graphics2D) g.create();
 
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -304,6 +300,18 @@ public class JDrawPanel extends JPanel
 
         //--DrawCenter marker
 
+        PrecisePoint zero = TranslatePointOut(new PrecisePoint());
+        if (zero.getX() > 0 && zero.getX() < this.getWidth())
+        {
+            g2d.setColor(Color.blue);
+            paintLine(g2d, new PrecisePoint(zero.getX(), 0), new PrecisePoint(zero.getX(), this.getHeight()));
+        }
+        if (zero.getY() > 0 && zero.getY() < this.getHeight())
+        {
+            g2d.setColor(Color.red);
+            paintLine(g2d, new PrecisePoint(0, zero.getY()), new PrecisePoint(this.getWidth(), zero.getY()));
+        }
+
         PrecisePoint lt = TranslatePointIn(new PrecisePoint());
         PrecisePoint rt = TranslatePointIn(new PrecisePoint(this.getWidth(), this.getHeight()));
 
@@ -343,13 +351,28 @@ public class JDrawPanel extends JPanel
             }
         }
 
-        PrecisePoint zero = TranslatePointOut(new PrecisePoint());
-        paintMarker(g2d, zero);
+        if (zero.getX() > 0 && zero.getX() < this.getWidth())
+        {
+            g2d.setColor(Color.blue);
+            Stroke stroke = g2d.getStroke();
+            g2d.setStroke(dashedStroke);
+            paintLine(g2d, new PrecisePoint(zero.getX(), zero.getY() % 20), new PrecisePoint(zero.getX(), this.getHeight()));
+            g2d.setStroke(stroke);
+        }
+        if (zero.getY() > 0 && zero.getY() < this.getHeight())
+        {
+            g2d.setColor(Color.red);
+            Stroke stroke = g2d.getStroke();
+            g2d.setStroke(dashedStroke);
+            paintLine(g2d, new PrecisePoint(zero.getX() % 20, zero.getY()), new PrecisePoint(this.getWidth(), zero.getY()));
+            g2d.setStroke(stroke);
+        }
 
         PrecisePoint p1 = new PrecisePoint(this.getWidth()/2, this.getHeight()/2 - 5);
         PrecisePoint p2 = new PrecisePoint(this.getWidth()/2, this.getHeight()/2 + 5);
         PrecisePoint p3 = new PrecisePoint(this.getWidth()/2 + 5, this.getHeight()/2);
         PrecisePoint p4 = new PrecisePoint(this.getWidth()/2 - 5, this.getHeight()/2);
+        g2d.setColor(Color.black);
         paintLine(g2d, p1, p2);
         paintLine(g2d, p3, p4);
     }

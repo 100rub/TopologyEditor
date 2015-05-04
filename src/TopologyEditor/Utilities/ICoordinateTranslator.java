@@ -1,7 +1,5 @@
 package TopologyEditor.Utilities;
 
-import TopologyEditor.PrecisePoint;
-
 /**
  * Created by VEF on 5/2/2015.
  */

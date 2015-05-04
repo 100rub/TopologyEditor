@@ -1,4 +1,4 @@
-package TopologyEditor;
+package TopologyEditor.Utilities;
 
 import java.awt.*;
 
@@ -42,6 +42,12 @@ public class PrecisePoint
         _y += shift.getY();
     }
 
+
+    public PrecisePoint Negatite()
+    {
+        return new PrecisePoint(-_x, -_y);
+    }
+
     public Point ToPoint()
     {
         return (new Point( (int)_x, (int)_y ));
@@ -62,6 +68,12 @@ public class PrecisePoint
     public PrecisePoint CopyShift(double x, double y)
     {
         PrecisePoint res = new PrecisePoint(this._x + x, this._y + y);
+        return res;
+    }
+
+    public PrecisePoint CopyShift(PrecisePoint point)
+    {
+        PrecisePoint res = new PrecisePoint(this._x + point.getX(), this._y + point.getY());
         return res;
     }
 

@@ -1,7 +1,7 @@
-package TopologyEditor;
+package TopologyEditor.Elements;
 
 import TopologyEditor.DataStoring.XMLHelper;
-import TopologyEditor.Elements.Element;
+import TopologyEditor.Utilities.PrecisePoint;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;

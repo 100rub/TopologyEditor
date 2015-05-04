@@ -15,4 +15,6 @@ public abstract class Action
 
 
     protected abstract ActionInfo ApplyMain(ActionParameters parameters);
+
+    public abstract String GetName();
 }

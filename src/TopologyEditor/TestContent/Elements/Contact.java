@@ -23,6 +23,6 @@ public class Contact extends Element
 
     public String GetName()
     {
-        return "Контакт";
+        return "contact";
     }
 }

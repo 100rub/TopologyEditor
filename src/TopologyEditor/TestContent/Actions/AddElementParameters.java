@@ -2,8 +2,8 @@ package TopologyEditor.TestContent.Actions;
 
 import TopologyEditor.Elements.Element;
 import TopologyEditor.EventsHandling.PointTargetedActionParameters;
-import TopologyEditor.PrecisePoint;
-import TopologyEditor.VirtualPane;
+import TopologyEditor.Utilities.PrecisePoint;
+import TopologyEditor.Elements.VirtualPane;
 
 /**
  * Created by VEF on 5/3/2015.

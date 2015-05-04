@@ -1,3 +1,7 @@
+package TopologyEditor.TestContent;
+
+import TopologyEditor.UI.MainForm;
+
 /**
  * Created by 100rub on 09.04.2015.
  */

@@ -1,16 +1,19 @@
+package TopologyEditor.UI;
+
 import TopologyEditor.Elements.*;
 import TopologyEditor.EventsHandling.*;
 import TopologyEditor.EventsHandling.Action;
 import TopologyEditor.EventsHandling.Listeners.IDoListener;
-import TopologyEditor.JDrawPanel;
-import TopologyEditor.PrecisePoint;
+import TopologyEditor.TestContent.Actions.MoveAction;
+import TopologyEditor.UI.JDrawPanel;
+import TopologyEditor.Utilities.PrecisePoint;
 import TopologyEditor.TestContent.Actions.AddElementAction;
 import TopologyEditor.TestContent.Actions.AddElementParameters;
 import TopologyEditor.TestContent.Actions.RemoveElementAction;
 import TopologyEditor.TestContent.Elements.Contact;
 import TopologyEditor.TestContent.Elements.ContactPainter;
 import TopologyEditor.Utilities.PainterLink;
-import TopologyEditor.VirtualPane;
+import TopologyEditor.Elements.VirtualPane;
 
 import javax.swing.*;
 import java.awt.*;
@@ -115,25 +118,18 @@ public class MainForm extends JFrame
         {
             public void OnDo(ActionHandler handler, Action action, ActionParameters params)
             {
+                int id = tabbedPane.getSelectedIndex();
+                String title = tabbedPane.getTitleAt(id);
+                if (!title.endsWith("*"))
+                    tabbedPane.setTitleAt(id, title + "*");
                 CurrentPanel.setHasUnsavedChanges(true);
                 UpdateUI();
             }
         };
+
         handler.RegisterDoListener(listener);
-        handler.RegisterReDoListener(new IDoListener()
-        {
-            public void OnDo(ActionHandler handler, Action action, ActionParameters params)
-            {
-                UpdateUI();
-            }
-        });
-        handler.RegisterUnDoListener(new IDoListener()
-        {
-            public void OnDo(ActionHandler handler, Action action, ActionParameters params)
-            {
-                UpdateUI();
-            }
-        });
+        handler.RegisterReDoListener(listener);
+        handler.RegisterUnDoListener(listener);
     }
 
 
@@ -270,8 +266,8 @@ public class MainForm extends JFrame
         }
         //-----------------
 
-        Panels.add(new JDrawPanel(null, PainterMap));   //creating empty pane for default
-        CurrentPanel = Panels.get(Panels.size()-1);     //setting it as current panel
+        CurrentPanel = new JDrawPanel(null, PainterMap);
+        Panels.add(CurrentPanel);
 
         initializeDrawPanelEvents(CurrentPanel);
 
@@ -342,7 +338,9 @@ public class MainForm extends JFrame
                 if(e.getButton() == MouseEvent.BUTTON1)     //left mouse button
                 {
                     leftMousePressed = true;
-                    //System.out.println("LeftMousePressed");
+                    System.out.println("LeftMousePressed");
+
+                    mouseDownPosition = new PrecisePoint(e.getX(), e.getY());
                 }
 
                 if(e.getButton() == MouseEvent.BUTTON3)     //right mouse button
@@ -351,8 +349,6 @@ public class MainForm extends JFrame
                     previousMousePosition = new PrecisePoint(e.getX(), e.getY());
                     //System.out.println("RightMousePressed");
                 }
-
-                mouseDownPosition = new PrecisePoint(e.getX(), e.getY());
             }
 
             public void mouseReleased(MouseEvent e)
@@ -360,10 +356,21 @@ public class MainForm extends JFrame
                 if(e.getButton() == MouseEvent.BUTTON1)
                 {
                     leftMousePressed = false;
-                    //System.out.println("LeftMouseReleased");
+                    System.out.println("LeftMouseReleased");
                     if(rightMousePressed)
                     {
                         previousMousePosition = new PrecisePoint(e.getX(), e.getY());
+                    }
+                    else
+                    {
+                        PrecisePoint clickPosition = CurrentPanel.TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
+                        PrecisePoint elementPosition = CurrentPanel.TranslatePointIn(mouseDownPosition);
+                        SelectedElement = CurrentPanel.SelectElement(elementPosition);
+
+                        if (SelectedElement != null)
+                        {
+                            handler.Do(new MoveAction(), new PointTargetedActionParameters(SelectedElement, clickPosition.CopyShift(elementPosition.Negatite())));
+                        }
                     }
                 }
 
@@ -378,17 +385,13 @@ public class MainForm extends JFrame
             }
         });
 
-        panel.addMouseMotionListener(new MouseMotionListener()
-        {
-            public void mouseDragged(MouseEvent e)
-            {
-                if(previousMousePosition == null)
-                {
+        panel.addMouseMotionListener(new MouseMotionListener() {
+            public void mouseDragged(MouseEvent e) {
+                if (previousMousePosition == null) {
                     previousMousePosition = mouseDownPosition;
                 }
 
-                if(!leftMousePressed && rightMousePressed)
-                {
+                if (!leftMousePressed && rightMousePressed) {
                     double dx = e.getX() - previousMousePosition.getX();
                     double dy = e.getY() - previousMousePosition.getY();
 
@@ -401,8 +404,7 @@ public class MainForm extends JFrame
                 CurrentPanel.repaint();
             }
 
-            public void mouseMoved(MouseEvent e)
-            {
+            public void mouseMoved(MouseEvent e) {
                 //System.out.println("mouseMoved");
             }
         });
@@ -512,6 +514,7 @@ public class MainForm extends JFrame
                 if (result == JFileChooser.APPROVE_OPTION)
                 {
                     CurrentPanel.AssignPane(VirtualPane.Load(fc.getSelectedFile().getAbsolutePath()));
+                    tabbedPane.setTitleAt(0, fc.getSelectedFile().getName());
                 }
             }
         }
@@ -523,6 +526,7 @@ public class MainForm extends JFrame
             if (result == JFileChooser.APPROVE_OPTION)
             {
                 CurrentPanel.AssignPane(VirtualPane.Load(fc.getSelectedFile().getAbsolutePath()));
+                tabbedPane.setTitleAt(0, fc.getSelectedFile().getName());
             }
         }
         UpdateUI();
@@ -540,11 +544,20 @@ public class MainForm extends JFrame
             if (returnVal == JFileChooser.APPROVE_OPTION)
             {
                 CurrentPanel.getPane().SaveAs(fc.getSelectedFile().getAbsolutePath());
+                tabbedPane.setTitleAt(0, fc.getSelectedFile().getName());
+                int id = tabbedPane.getSelectedIndex();
+                String title = tabbedPane.getTitleAt(id);
+                if (title.endsWith("*"))
+                    tabbedPane.setTitleAt(id, title.substring(0, title.length() - 1));
                 CurrentPanel.setHasUnsavedChanges(false);
             }
         }
         else
         {
+            int id = tabbedPane.getSelectedIndex();
+            String title = tabbedPane.getTitleAt(id);
+            if (title.endsWith("*"))
+                tabbedPane.setTitleAt(id, title.substring(0, title.length() - 1));
             CurrentPanel.setHasUnsavedChanges(false);
         }
         UpdateUI();
@@ -560,6 +573,11 @@ public class MainForm extends JFrame
         if (returnVal == JFileChooser.APPROVE_OPTION)
         {
             CurrentPanel.getPane().SaveAs(fc.getSelectedFile().getAbsolutePath());
+            tabbedPane.setTitleAt(0, fc.getSelectedFile().getName());
+            int id = tabbedPane.getSelectedIndex();
+            String title = tabbedPane.getTitleAt(id);
+            if (title.endsWith("*"))
+                tabbedPane.setTitleAt(id, title.substring(0, title.length() - 1));
             CurrentPanel.setHasUnsavedChanges(false);
         }
         UpdateUI();
@@ -597,24 +615,20 @@ public class MainForm extends JFrame
 
     private void UpdateUI()
     {
-        //Undo menu
-        if(handler.GetLastAction() != null)
-        {
-            UndoMenuItem.setEnabled(true);
-        }
+        ActionInfo info = handler.GetLastAction();
+        UndoMenuItem.setEnabled(info != null);
+        if (info != null)
+            UndoMenuItem.setText("Undo " + info.GetAction().GetName());
         else
-        {
-            UndoMenuItem.setEnabled(false);
-        }
+            UndoMenuItem.setText("Undo");
 
-        if(handler.GetLastUndo() != null)
-        {
-            RedoMenuItem.setEnabled(true);
-        }
+        info = handler.GetLastUndo();
+        RedoMenuItem.setEnabled(info != null);
+        if (info != null)
+            RedoMenuItem.setText("Redo " + info.GetAction().GetName());
         else
-        {
-            RedoMenuItem.setEnabled(false);
-        }
+            RedoMenuItem.setText("Redo");
+
         CurrentPanel.repaint();
     }
 

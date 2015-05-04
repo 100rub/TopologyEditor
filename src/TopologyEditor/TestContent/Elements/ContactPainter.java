@@ -2,7 +2,7 @@ package TopologyEditor.TestContent.Elements;
 
 import TopologyEditor.Elements.Element;
 import TopologyEditor.Elements.IPainter;
-import TopologyEditor.PrecisePoint;
+import TopologyEditor.Utilities.PrecisePoint;
 import TopologyEditor.Utilities.ICoordinateTranslator;
 
 import java.awt.*;

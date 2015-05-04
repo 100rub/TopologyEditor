@@ -1,6 +1,6 @@
 package TopologyEditor.Elements;
 
-import TopologyEditor.PrecisePoint;
+import TopologyEditor.Utilities.PrecisePoint;
 import TopologyEditor.Utilities.ICoordinateTranslator;
 
 import java.awt.*;

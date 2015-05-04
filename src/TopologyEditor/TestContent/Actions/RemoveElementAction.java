@@ -4,13 +4,15 @@ import TopologyEditor.Elements.Element;
 import TopologyEditor.EventsHandling.Action;
 import TopologyEditor.EventsHandling.ActionInfo;
 import TopologyEditor.EventsHandling.ActionParameters;
-import TopologyEditor.VirtualPane;
+import TopologyEditor.Elements.VirtualPane;
 
 /**
  * Created by VEF on 5/3/2015.
  */
 public class RemoveElementAction extends Action
 {
+    private String _elementName;
+
     protected ActionInfo ApplyMain(ActionParameters parameters)
     {
         Element target = parameters.GetTarget();
@@ -20,6 +22,11 @@ public class RemoveElementAction extends Action
 
         pane.getElements().remove(target);
 
+        _elementName = target.GetName();
         return revertInfo;
+    }
+
+    public String GetName() {
+        return " removing " + _elementName;
     }
 }

@@ -1,7 +1,6 @@
 package TopologyEditor.Elements;
 
-import TopologyEditor.PrecisePoint;
-import TopologyEditor.VirtualPane;
+import TopologyEditor.Utilities.PrecisePoint;
 
 /**
  * Created by VEF on 23.04.2015.

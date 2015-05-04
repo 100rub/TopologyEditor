@@ -1,7 +1,7 @@
 package TopologyEditor.EventsHandling;
 
 import TopologyEditor.Elements.Element;
-import TopologyEditor.PrecisePoint;
+import TopologyEditor.Utilities.PrecisePoint;
 
 /**
  * Created by VEF on 24.04.2015.
