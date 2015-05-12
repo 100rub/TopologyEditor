@@ -22,15 +22,29 @@ public class DefaultPainter implements IPainter
     public boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom)
     {
         PrecisePoint pos = element.getPosition();
+        double x = pos.getX();
+        double y = pos.getY();
 
-        return  pos.getX() - 5 > leftTop.getX() &&
-                pos.getY() + 5 < leftTop.getY() &&
-                pos.getX() + 5 < rightBottom.getX() &&
-                pos.getY() - 5 > rightBottom.getY();
+        return  x + 5 > leftTop.getX() &&
+                x - 5 < rightBottom.getX() &&
+                y + 5 > rightBottom.getY() &&
+                y - 5 < leftTop.getY();
     }
 
     public boolean IsClicked(Element element, PrecisePoint point)
     {
         return IsOnScreen(element, point, point);
+    }
+
+    public boolean IsSelected(Element element, PrecisePoint leftTop, PrecisePoint rightBottom)
+    {
+        PrecisePoint pos = element.getPosition();
+        double x = pos.getX();
+        double y = pos.getY();
+
+        return  x - 5 > leftTop.getX() &&
+                x + 5 < rightBottom.getX() &&
+                y - 5 > rightBottom.getY() &&
+                y + 5 < leftTop.getY();
     }
 }

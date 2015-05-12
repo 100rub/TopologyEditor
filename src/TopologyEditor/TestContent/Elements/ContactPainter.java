@@ -28,11 +28,14 @@ public class ContactPainter implements IPainter
     public boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom)
     {
         PrecisePoint pos = element.getPosition();
+        double x = pos.getX();
+        double y = pos.getY();
+        double size = ((Contact)element).getSize();
 
-        return  pos.getX() > leftTop.getX() &&
-                pos.getY() < leftTop.getY() &&
-                pos.getX() < rightBottom.getX() &&
-                pos.getY() > rightBottom.getY();
+        return  x + size > leftTop.getX() &&
+                x - size < rightBottom.getX() &&
+                y + size > rightBottom.getY() &&
+                y - size < leftTop.getY();
     }
 
     public boolean IsClicked(Element element, PrecisePoint point)
@@ -43,5 +46,18 @@ public class ContactPainter implements IPainter
         double size = ((Contact)element).getSize();
 
         return  x*x + y*y <= size*size/4;
+    }
+
+    public boolean IsSelected(Element element, PrecisePoint leftTop, PrecisePoint rightBottom)
+    {
+        PrecisePoint pos = element.getPosition();
+        double x = pos.getX();
+        double y = pos.getY();
+        double size = ((Contact)element).getSize();
+
+        return  x - size > leftTop.getX() &&
+                x + size < rightBottom.getX() &&
+                y - size > rightBottom.getY() &&
+                y + size < leftTop.getY();
     }
 }

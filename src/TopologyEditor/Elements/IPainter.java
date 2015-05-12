@@ -10,9 +10,11 @@ import java.awt.*;
  */
 public interface IPainter
 {
-    public void Draw(Element element, Graphics2D graphics, ICoordinateTranslator translator);
+    void Draw(Element element, Graphics2D graphics, ICoordinateTranslator translator);
 
-    public boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom);
+    boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom);
 
-    public boolean IsClicked(Element element, PrecisePoint point);
+    boolean IsClicked(Element element, PrecisePoint point);
+
+    boolean IsSelected(Element element, PrecisePoint leftTop, PrecisePoint rightBottom);
 }
