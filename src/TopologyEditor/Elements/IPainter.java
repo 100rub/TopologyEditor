@@ -12,6 +12,8 @@ public interface IPainter
 {
     void Draw(Element element, Graphics2D graphics, ICoordinateTranslator translator);
 
+    void DrawBorder(Element element, Graphics2D graphics, ICoordinateTranslator translator);
+
     boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom);
 
     boolean IsClicked(Element element, PrecisePoint point);

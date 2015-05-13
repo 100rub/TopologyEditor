@@ -1,5 +1,7 @@
 package TopologyEditor.Elements;
 
+import TopologyEditor.TestContent.Elements.Contact;
+import TopologyEditor.Utilities.G2DHelper;
 import TopologyEditor.Utilities.PrecisePoint;
 import TopologyEditor.Utilities.ICoordinateTranslator;
 
@@ -17,6 +19,16 @@ public class DefaultPainter implements IPainter
         graphics.drawLine((int)pos.getX()-5, (int)pos.getY()-5, (int)pos.getX()+5, (int)pos.getY()+5);
         graphics.drawLine((int)pos.getX()+5, (int)pos.getY()-5, (int)pos.getX()-5, (int)pos.getY()+5);
         graphics.drawString(element.GetName(), (int)pos.getX()-5, (int)pos.getY()+15);
+    }
+
+    public void DrawBorder(Element element, Graphics2D graphics, ICoordinateTranslator translator)
+    {
+        Contact c = (Contact)element;
+        PrecisePoint pos = translator.TranslatePointOut(c.getPosition());
+        double size = translator.TranslateValueOut(c.getSize()) / 2 * 1.2;
+
+        graphics.setStroke(G2DHelper.GetDashedStroke());
+        G2DHelper.DrawRect(graphics, pos, size);
     }
 
     public boolean IsOnScreen(Element element, PrecisePoint leftTop, PrecisePoint rightBottom)
