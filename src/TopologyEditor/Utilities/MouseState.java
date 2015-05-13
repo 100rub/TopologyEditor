@@ -8,5 +8,6 @@ public enum MouseState
     NONE,
     SELECTING_ELEMENTS,
     MOVING_ELEMENT,
-    MOVING_CAMERA
+    MOVING_CAMERA,
+    ADDING_ELEMENT
 }

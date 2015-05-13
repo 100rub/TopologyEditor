@@ -146,7 +146,26 @@ public class JDrawPanel extends JPanel
                     {
                         case NONE:
                         {
-                            mouseState = MouseState.SELECTING_ELEMENTS;
+                            if(!SelectedElements.isEmpty())
+                            {
+                                for(Element elem : SelectedElements)
+                                {
+                                    IPainter painter = PainterMap.get(new PainterLink(_drawMode, elem.getClass()));
+
+                                    if(painter == null)
+                                    {
+                                        painter = new DefaultPainter();
+                                    }
+
+                                    if(painter.IsClicked(elem, GetTranslator().TranslatePointIn(mouseDownPosition)))
+                                    {
+                                        mouseState = MouseState.MOVING_ELEMENT;
+                                        break;
+                                    }
+                                }
+                            }
+                            if(mouseState == MouseState.NONE)
+                                mouseState = MouseState.SELECTING_ELEMENTS;
                             break;
                         }
                         case SELECTING_ELEMENTS:
