@@ -4,12 +4,17 @@ import TopologyEditor.Elements.DefaultPainter;
 import TopologyEditor.Elements.Element;
 import TopologyEditor.Elements.IPainter;
 import TopologyEditor.Elements.VirtualPane;
+import TopologyEditor.EventsHandling.*;
+import TopologyEditor.EventsHandling.Listeners.IDoListener;
+import TopologyEditor.TestContent.Actions.MoveAction;
 import TopologyEditor.Utilities.ICoordinateTranslator;
+import TopologyEditor.Utilities.MouseState;
 import TopologyEditor.Utilities.PainterLink;
 import TopologyEditor.Utilities.PrecisePoint;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -20,6 +25,8 @@ public class JDrawPanel extends JPanel
 {
     private HashMap<PainterLink, IPainter> PainterMap;
 
+    private ActionHandler handler;
+
     private VirtualPane _assignedPane;
     private int _zoomLevel;                 //0 is default
     private double _zoomCoefficient;        //1.0 is default, closer=bigger
@@ -28,6 +35,18 @@ public class JDrawPanel extends JPanel
     private int gridPointsDistance = 20;
     private ICoordinateTranslator _coordTranslator;
     private String _drawMode;
+
+    private ArrayList<Element> SelectedElements;
+
+    private MouseState mouseState;
+
+    private boolean leftMousePressed = false;
+    private boolean rightMousePressed = false;
+
+    private PrecisePoint mouseDownPosition;         //on-screen coordinates
+    private PrecisePoint mouseUpPosition;           //on-screen coordinates
+    private PrecisePoint previousMousePosition;     //on-screen coordinates
+    private PrecisePoint currentMousePosition;      //on-screen coordinates
 
     private boolean _hasUnsavedChanges;
 
@@ -51,6 +70,342 @@ public class JDrawPanel extends JPanel
         _zoomCoefficient = 1;
         _viewPoint = new PrecisePoint();
         _hasUnsavedChanges = false;
+
+        mouseState = MouseState.NONE;
+
+        SelectedElements = new ArrayList<Element>();
+
+        handler = new ActionHandler();
+
+        initializeEvents();
+    }
+
+
+
+    private void initializeEvents()
+    {
+        this.addMouseListener(new MouseAdapter()
+        {
+            /*public void mouseClicked(MouseEvent e)
+            {
+                if(e.getButton() == MouseEvent.BUTTON1)     //left mouse button
+                {
+
+                    //System.out.println("LeftMouseClicked");
+                    if(!rightMousePressed)
+                    {
+                        PrecisePoint clickPosition = CurrentPanel.GetTranslator().TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
+                        SelectedElements.get(0) = CurrentPanel.SelectElement(clickPosition);
+
+                        if (SelectedElement == null)
+                        {
+                            Contact c = new Contact();
+                            c.setSize(Math.random() * 15 + 5);
+                            c.setInnerSize(Math.random() * ((c.getSize() - 4) * .8) + 4);
+                            handler.Do(new AddElementAction(), new AddElementParameters(c, clickPosition, CurrentPanel.getPane()));
+                            CurrentPanel.repaint();
+                        }
+                        else
+                        {
+                            handler.Do(new RemoveElementAction(), new ActionParameters(SelectedElement));
+                            CurrentPanel.repaint();
+                        }
+                    }
+                }
+
+                if(e.getButton() == MouseEvent.BUTTON3)     //right mouse button
+                {
+                    //System.out.println("RightMouseClicked");
+                    if (!leftMousePressed)
+                    {
+
+                    }
+                }
+            }*/
+
+            public void mouseEntered(MouseEvent e)
+            {
+                //System.out.println("mouseEntered");
+            }
+
+            public void mouseExited(MouseEvent e)
+            {
+                //System.out.println("mouseExited");
+            }
+
+            public void mousePressed(MouseEvent e)
+            {
+                mouseDownPosition = new PrecisePoint(e.getX(), e.getY());
+                previousMousePosition = null;
+
+                if(e.getButton() == MouseEvent.BUTTON1)     //left mouse button pressed
+                {
+                    leftMousePressed = true;
+
+                    switch (mouseState)
+                    {
+                        case NONE:
+                        {
+                            mouseState = MouseState.SELECTING_ELEMENTS;
+                            break;
+                        }
+                        case SELECTING_ELEMENTS:
+                        {
+                            break;
+                        }
+                        case MOVING_ELEMENT:
+                        {
+                            break;
+                        }
+                        case MOVING_CAMERA:
+                        {
+                            break;
+                        }
+                    }
+                    //System.out.println("LeftMousePressed");
+                }
+
+                if(e.getButton() == MouseEvent.BUTTON3)     //right mouse button pressed
+                {
+                    rightMousePressed = true;
+
+                    switch (mouseState)
+                    {
+                        case NONE:
+                        {
+                            mouseState = MouseState.MOVING_CAMERA;
+                            break;
+                        }
+                        case SELECTING_ELEMENTS:
+                        {
+                            break;
+                        }
+                        case MOVING_ELEMENT:
+                        {
+                            break;
+                        }
+                        case MOVING_CAMERA:
+                        {
+                            break;
+                        }
+                    }
+                    //System.out.println("RightMousePressed");
+                }
+            }
+
+            public void mouseReleased(MouseEvent e)
+            {
+                mouseUpPosition = new PrecisePoint(e.getX(), e.getY());
+
+                if(e.getButton() == MouseEvent.BUTTON1)     //left mouse button released
+                {
+                    leftMousePressed = false;
+
+                    switch (mouseState)
+                    {
+                        case NONE:
+                        {
+                            break;
+                        }
+                        case SELECTING_ELEMENTS:
+                        {
+                            SelectedElements.clear();
+                            if(mouseUpPosition != null && mouseDownPosition != null)
+                            {
+                                PrecisePoint lt = new PrecisePoint();
+                                PrecisePoint rb = new PrecisePoint();
+
+                                if(mouseDownPosition.getX() > mouseUpPosition.getX())
+                                {
+                                    rb.setX(mouseDownPosition.getX());
+                                    lt.setX(mouseUpPosition.getX());
+                                }
+                                else
+                                {
+                                    rb.setX(mouseUpPosition.getX());
+                                    lt.setX(mouseDownPosition.getX());
+                                }
+
+                                if(mouseDownPosition.getY() > mouseUpPosition.getY())
+                                {
+                                    rb.setY(mouseDownPosition.getY());
+                                    lt.setY(mouseUpPosition.getY());
+                                }
+                                else
+                                {
+                                    rb.setY(mouseUpPosition.getY());
+                                    lt.setY(mouseDownPosition.getY());
+                                }
+
+                                for(Element elem : getPane().getElements())
+                                {
+                                    IPainter painter = PainterMap.get(new PainterLink(_drawMode, elem.getClass()));
+
+                                    if(painter == null)
+                                    {
+                                        painter = new DefaultPainter();
+                                    }
+
+                                    if(painter.IsSelected(elem, GetTranslator().TranslatePointIn(lt), GetTranslator().TranslatePointIn(rb)))
+                                    {
+                                        SelectedElements.add(elem);
+                                    }
+                                }
+                            }
+                            System.out.println("Selected elements: " + SelectedElements.size());
+                            repaint();
+
+                            mouseUpPosition = null;
+                            mouseDownPosition = null;
+                            currentMousePosition = null;
+                            mouseState = MouseState.NONE;
+                            break;
+                        }
+                        case MOVING_ELEMENT:
+                        {
+                            if(!SelectedElements.isEmpty())
+                            {
+                                PrecisePoint clickPosition = GetTranslator().TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
+                                PrecisePoint elementPosition = GetTranslator().TranslatePointIn(mouseDownPosition);
+
+                                for(Element elem : SelectedElements)
+                                {
+                                    if (elem != null)
+                                    {
+                                        handler.Do(new MoveAction(), new PointTargetedActionParameters(elem, clickPosition.CopyShift(elementPosition.Negatite())));
+                                    }
+                                }
+                            }
+
+                            repaint();
+
+                            mouseState = MouseState.NONE;
+                            break;
+                        }
+                        case MOVING_CAMERA:
+                        {
+                            break;
+                        }
+                    }
+                    //System.out.println("LeftMouseReleased");
+                }
+
+                if(e.getButton() == MouseEvent.BUTTON3)     //right mouse button released
+                {
+                    rightMousePressed = false;
+
+                    switch (mouseState)
+                    {
+                        case NONE:
+                        {
+                            break;
+                        }
+                        case SELECTING_ELEMENTS:
+                        {
+                            break;
+                        }
+                        case MOVING_ELEMENT:
+                        {
+                            break;
+                        }
+                        case MOVING_CAMERA:
+                        {
+                            repaint();
+                            mouseState = MouseState.NONE;
+                            break;
+                        }
+                    }
+                    //System.out.println("RightMouseReleased");
+                }
+            }
+        });
+
+        this.addMouseMotionListener(new MouseMotionListener() {
+            public void mouseDragged(MouseEvent e) {
+                if (previousMousePosition == null) {
+                    previousMousePosition = mouseDownPosition;
+                }
+
+                currentMousePosition = new PrecisePoint(e.getX(), e.getY());
+
+                switch (mouseState) {
+                    case NONE: {
+                        break;
+                    }
+                    case SELECTING_ELEMENTS: {
+                        break;
+                    }
+                    case MOVING_ELEMENT: {
+                        break;
+                    }
+                    case MOVING_CAMERA: {
+                        double dx = e.getX() - previousMousePosition.getX();
+                        double dy = e.getY() - previousMousePosition.getY();
+
+                        MoveViewPoint(-dx, dy);
+
+                        previousMousePosition.setX(e.getX());
+                        previousMousePosition.setY(e.getY());
+                        break;
+                    }
+                }
+
+                repaint();
+            }
+
+            public void mouseMoved(MouseEvent e)
+            {
+                currentMousePosition = new PrecisePoint(e.getX(), e.getY());
+                //System.out.println("mouseMoved");
+            }
+        });
+
+        this.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                int wheel_d = e.getWheelRotation();
+                //System.out.println("mouseWheelMoved " + wheel_d);
+
+                if (Math.abs(getZoomLevel() + wheel_d) <= 20) {
+                    setZoomLevel(getZoomLevel() + wheel_d);
+                }
+
+                int zoom_lvl = getZoomLevel();
+                double res_zoom_coef = 1;
+                for (int i = 0; i < Math.abs(zoom_lvl); i++) {
+                    if (zoom_lvl < 0) {
+                        res_zoom_coef = res_zoom_coef * 1.1;
+                        //CurrentPanel.set_zoomCoefficient(CurrentPanel.get_zoomCoefficient() * 1.1);
+                    }
+                    if (zoom_lvl > 0) {
+                        res_zoom_coef = res_zoom_coef / 1.1;
+                        //CurrentPanel.set_zoomCoefficient(CurrentPanel.get_zoomCoefficient() / 1.1);
+                    }
+                }
+
+                PrecisePoint mousePosInsideBefore = GetTranslator().TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
+
+                setZoomCoefficient(res_zoom_coef);
+
+                PrecisePoint mousePosInsideAfter = GetTranslator().TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
+
+                PrecisePoint d = new PrecisePoint(mousePosInsideBefore.getX() - mousePosInsideAfter.getX(), mousePosInsideBefore.getY() - mousePosInsideAfter.getY());
+
+                if (wheel_d < 0)
+                {
+                    MoveViewPoint(d.getX() * getZoomCoefficient(), d.getY() * getZoomCoefficient());
+                }
+
+                if (wheel_d > 0)
+                {
+                    MoveViewPoint(d.getX() * getZoomCoefficient(), d.getY() * getZoomCoefficient());
+                }
+
+                //System.out.println("zoom_lvl " + CurrentPanel.get_zoomLevel());
+                //System.out.println("zoom_coef " + CurrentPanel.get_zoomCoefficient());
+                repaint();
+            }
+        });
     }
 
 
@@ -86,6 +441,20 @@ public class JDrawPanel extends JPanel
             }
         }
         return null;
+    }
+
+
+
+    public ActionHandler getHandler()
+    {
+        return handler;
+    }
+
+
+
+    public void setHandler(ActionHandler hndlr)
+    {
+        handler = hndlr;
     }
 
 
@@ -163,6 +532,34 @@ public class JDrawPanel extends JPanel
     public double getZoomCoefficient()
     {
         return _zoomCoefficient;
+    }
+
+
+
+    public void setMouseDownPosition(PrecisePoint pnt)
+    {
+        mouseDownPosition = pnt.Copy();
+    }
+
+
+
+    public PrecisePoint getMouseDownPosition()
+    {
+        return mouseDownPosition;
+    }
+
+
+
+    public void setMouseUpPosition(PrecisePoint pnt)
+    {
+        mouseUpPosition = pnt.Copy();
+    }
+
+
+
+    public PrecisePoint getMouseUpPosition()
+    {
+        return mouseUpPosition;
     }
 
 
@@ -269,9 +666,62 @@ public class JDrawPanel extends JPanel
     }
 
 
+
+    private void paintSelectionRect(Graphics2D g2d)
+    {
+        if(currentMousePosition != null && mouseDownPosition != null && mouseState == MouseState.SELECTING_ELEMENTS)
+        {
+            PrecisePoint lt = new PrecisePoint();
+            PrecisePoint rt = new PrecisePoint();
+            PrecisePoint lb = new PrecisePoint();
+            PrecisePoint rb = new PrecisePoint();
+
+            if(mouseDownPosition.getX() > currentMousePosition.getX())
+            {
+                rt.setX(mouseDownPosition.getX());
+                rb.setX(mouseDownPosition.getX());
+
+                lt.setX(currentMousePosition.getX());
+                lb.setX(currentMousePosition.getX());
+            }
+            else
+            {
+                rt.setX(currentMousePosition.getX());
+                rb.setX(currentMousePosition.getX());
+
+                lt.setX(mouseDownPosition.getX());
+                lb.setX(mouseDownPosition.getX());
+            }
+
+            if(mouseDownPosition.getY() > currentMousePosition.getY())
+            {
+                lb.setY(mouseDownPosition.getY());
+                rb.setY(mouseDownPosition.getY());
+
+                lt.setY(currentMousePosition.getY());
+                rt.setY(currentMousePosition.getY());
+            }
+            else
+            {
+                lb.setY(currentMousePosition.getY());
+                rb.setY(currentMousePosition.getY());
+
+                lt.setY(mouseDownPosition.getY());
+                rt.setY(mouseDownPosition.getY());
+            }
+
+            paintLine(g2d, lt, rt);
+            paintLine(g2d, lb, rb);
+            paintLine(g2d, lt, lb);
+            paintLine(g2d, rt, rb);
+        }
+    }
+
+
+
     private void paintFigure(Graphics2D g2d, ArrayList<PrecisePoint> list)
     {
-        //TODO
+        //TODO complete
         for(int i=0; i<list.size()-1; i++)
         {
             PrecisePoint a = list.get(i);
@@ -279,6 +729,7 @@ public class JDrawPanel extends JPanel
             //g2d.drawLine((int)a.getX(), (int)a.getY(), (int)b.getX(), (int)b.getY());
         }
     }
+
 
 
     public void paintComponent(Graphics g)
@@ -347,6 +798,9 @@ public class JDrawPanel extends JPanel
 
         //System.out.println("Element count: " + _assignedPane.getElements().size());
 
+        //--Draw all elements
+
+        g2d.setColor(Color.black);
         for(Element element : _assignedPane.getElements())
         {
             IPainter painter = PainterMap.get(new PainterLink(_drawMode, element.getClass()));
@@ -359,6 +813,24 @@ public class JDrawPanel extends JPanel
             if(painter.IsOnScreen(element, lt, rt))
             {
                 painter.Draw(element, (Graphics2D)g2d.create(), GetTranslator());
+            }
+        }
+
+        //--Draw selected elements
+
+        g2d.setColor(Color.red);
+        for(Element element : SelectedElements)
+        {
+            IPainter painter = PainterMap.get(new PainterLink(_drawMode, element.getClass()));
+
+            if(painter == null)
+            {
+                painter = new DefaultPainter();
+            }
+
+            if(painter.IsOnScreen(element, lt, rt))
+            {
+                painter.DrawBorder(element,(Graphics2D) g2d.create(), GetTranslator());
             }
         }
 
@@ -383,5 +855,8 @@ public class JDrawPanel extends JPanel
         g2d.setColor(Color.black);
         paintLine(g2d, p1, p2);
         paintLine(g2d, p3, p4);
+
+        g2d.setColor(new Color(0, 0, 255));
+        paintSelectionRect((Graphics2D) g2d.create());
     }
 }

@@ -6,6 +6,7 @@ import TopologyEditor.EventsHandling.Action;
 import TopologyEditor.EventsHandling.Listeners.IDoListener;
 import TopologyEditor.TestContent.Actions.MoveAction;
 import TopologyEditor.UI.JDrawPanel;
+import TopologyEditor.Utilities.MouseState;
 import TopologyEditor.Utilities.PrecisePoint;
 import TopologyEditor.TestContent.Actions.AddElementAction;
 import TopologyEditor.TestContent.Actions.AddElementParameters;
@@ -39,7 +40,7 @@ public class MainForm extends JFrame
     /**
      * обработчик событий
      */
-    private ActionHandler handler;
+    //private ActionHandler handler;
 
     private ArrayList<String> drawModes;
     private HashMap<PainterLink, IPainter> PainterMap;
@@ -66,15 +67,7 @@ public class MainForm extends JFrame
     private JMenuItem SettingsMenuItem;
     //--------------
 
-    private boolean leftMousePressed = false;
-    private boolean rightMousePressed = false;
-
     private JDrawPanel CurrentPanel;    //pointer to currently selected JDrawPanel
-    private PrecisePoint mouseDownPosition;
-    private PrecisePoint mouseUpPosition;
-    private PrecisePoint previousMousePosition;
-
-    private Element SelectedElement;
 
     private String currDir;
 
@@ -88,32 +81,17 @@ public class MainForm extends JFrame
             c.setPosition(new PrecisePoint(r.nextDouble()*1000-500, r.nextDouble()*1000-500));
             CurrentPanel.getPane().getElements().add(c);
         }
-
-        //PrecisePoint tmp = new PrecisePoint();
-        //System.out.println(tmp.ToString());
-        //System.out.println(CurrentPanel.translateOut(CurrentPanel.translateIn(tmp)).ToString());
-
-        /*c = new Contact();
-        c.setSize(5);
-        c.setPosition(new PrecisePoint(-1.5, 1.5));
-        CurrentPanel.getPane().getElements().add(c);
-
-        MoveAction moveAction = new MoveAction();
-
-        c = (Contact)CurrentPanel.getPane().getElements().get(0);
-        handler.Do(moveAction, new PointTargetedActionParameters(c, new PrecisePoint(1, 1)));
-
-        handler.Undo();
-        handler.Redo();*/
     }
 
 
 
-    private void InitHandler()
+    private void InitHandler(JDrawPanel panel)
     {
+        ActionHandler hndlr = panel.getHandler();
+
         IDoListener listener = new IDoListener()
         {
-            public void OnDo(ActionHandler handler, Action action, ActionParameters params)
+            public void OnDo(ActionHandler handler, TopologyEditor.EventsHandling.Action action, ActionParameters params)
             {
                 int id = tabbedPane.getSelectedIndex();
                 String title = tabbedPane.getTitleAt(id);
@@ -124,9 +102,9 @@ public class MainForm extends JFrame
             }
         };
 
-        handler.RegisterDoListener(listener);
-        handler.RegisterReDoListener(listener);
-        handler.RegisterUnDoListener(listener);
+        hndlr.RegisterDoListener(listener);
+        hndlr.RegisterReDoListener(listener);
+        hndlr.RegisterUnDoListener(listener);
     }
 
 
@@ -267,8 +245,8 @@ public class MainForm extends JFrame
 
         CurrentPanel = new JDrawPanel(null, PainterMap);
         Panels.add(CurrentPanel);
+        InitHandler(CurrentPanel);
 
-        initializeDrawPanelEvents(CurrentPanel);
         cbDrawMode.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e)
             {
@@ -285,193 +263,7 @@ public class MainForm extends JFrame
         tabbedPane.removeTabAt(0);
         tabbedPane.setTitleAt(0, "Untitled");
 
-        SelectedElement = null;
-
-        //loadTestData();     //TODO REMOVE
-
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
-
-
-
-    private void initializeDrawPanelEvents(JDrawPanel panel)
-    {
-        panel.addMouseListener(new MouseAdapter()
-        {
-            public void mouseClicked(MouseEvent e)
-            {
-                if(e.getButton() == MouseEvent.BUTTON1)     //left mouse button
-                {
-                    //System.out.println("LeftMouseClicked");
-                    if(!rightMousePressed)
-                    {
-                        PrecisePoint clickPosition = CurrentPanel.GetTranslator().TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
-                        SelectedElement = CurrentPanel.SelectElement(clickPosition);
-
-                        if (SelectedElement == null)
-                        {
-                            Contact c = new Contact();
-                            c.setSize(Math.random() * 15 + 5);
-                            c.setInnerSize(Math.random() * ((c.getSize() - 4) * .8) + 4);
-                            handler.Do(new AddElementAction(), new AddElementParameters(c, clickPosition, CurrentPanel.getPane()));
-                            CurrentPanel.repaint();
-                        }
-                        else
-                        {
-                            handler.Do(new RemoveElementAction(), new ActionParameters(SelectedElement));
-                            CurrentPanel.repaint();
-                        }
-                    }
-                }
-
-                if(e.getButton() == MouseEvent.BUTTON3)     //right mouse button
-                {
-                    //System.out.println("RightMouseClicked");
-                    if (!leftMousePressed)
-                    {
-
-                    }
-                }
-            }
-
-            public void mouseEntered(MouseEvent e)
-            {
-                //System.out.println("mouseEntered");
-            }
-
-            public void mouseExited(MouseEvent e)
-            {
-                //System.out.println("mouseExited");
-            }
-
-            public void mousePressed(MouseEvent e)
-            {
-                if(e.getButton() == MouseEvent.BUTTON1)     //left mouse button
-                {
-                    leftMousePressed = true;
-                    //System.out.println("LeftMousePressed");
-
-                    mouseDownPosition = new PrecisePoint(e.getX(), e.getY());
-                }
-
-                if(e.getButton() == MouseEvent.BUTTON3)     //right mouse button
-                {
-                    rightMousePressed = true;
-                    previousMousePosition = new PrecisePoint(e.getX(), e.getY());
-                    //System.out.println("RightMousePressed");
-                }
-            }
-
-            public void mouseReleased(MouseEvent e)
-            {
-                if(e.getButton() == MouseEvent.BUTTON1)
-                {
-                    leftMousePressed = false;
-                    //System.out.println("LeftMouseReleased");
-                    if(rightMousePressed)
-                    {
-                        previousMousePosition = new PrecisePoint(e.getX(), e.getY());
-                    }
-                    else
-                    {
-                        PrecisePoint clickPosition = CurrentPanel.GetTranslator().TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
-                        PrecisePoint elementPosition = CurrentPanel.GetTranslator().TranslatePointIn(mouseDownPosition);
-                        SelectedElement = CurrentPanel.SelectElement(elementPosition);
-
-                        if (SelectedElement != null)
-                        {
-                            handler.Do(new MoveAction(), new PointTargetedActionParameters(SelectedElement, clickPosition.CopyShift(elementPosition.Negatite())));
-                        }
-                    }
-                }
-
-                if(e.getButton() == MouseEvent.BUTTON3)
-                {
-                    rightMousePressed = false;
-                    //System.out.println("RightMouseReleased");
-                }
-
-                mouseUpPosition = new PrecisePoint(e.getX(), e.getY());
-                //System.out.println("viewPoint x=" + CurrentPanel.get_viewPointCoordsInside().getX() + " y=" + CurrentPanel.get_viewPointCoordsInside().getY());
-            }
-        });
-
-        panel.addMouseMotionListener(new MouseMotionListener() {
-            public void mouseDragged(MouseEvent e) {
-                if (previousMousePosition == null) {
-                    previousMousePosition = mouseDownPosition;
-                }
-
-                if (!leftMousePressed && rightMousePressed) {
-                    double dx = e.getX() - previousMousePosition.getX();
-                    double dy = e.getY() - previousMousePosition.getY();
-
-                    CurrentPanel.MoveViewPoint(-dx, dy);
-
-                    previousMousePosition.setX(e.getX());
-                    previousMousePosition.setY(e.getY());
-                }
-
-                CurrentPanel.repaint();
-            }
-
-            public void mouseMoved(MouseEvent e) {
-                //System.out.println("mouseMoved");
-            }
-        });
-
-        panel.addMouseWheelListener(new MouseWheelListener()
-        {
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e)
-            {
-                int wheel_d = e.getWheelRotation();
-                //System.out.println("mouseWheelMoved " + wheel_d);
-
-                if(Math.abs(CurrentPanel.getZoomLevel() + wheel_d) <= 20)
-                {
-                    CurrentPanel.setZoomLevel(CurrentPanel.getZoomLevel() + wheel_d);
-                }
-
-                int zoom_lvl = CurrentPanel.getZoomLevel();
-                double res_zoom_coef = 1;
-                for(int i=0; i<Math.abs(zoom_lvl); i++)
-                {
-                    if(zoom_lvl < 0)
-                    {
-                        res_zoom_coef = res_zoom_coef * 1.1;
-                        //CurrentPanel.set_zoomCoefficient(CurrentPanel.get_zoomCoefficient() * 1.1);
-                    }
-                    if(zoom_lvl > 0)
-                    {
-                        res_zoom_coef = res_zoom_coef / 1.1;
-                        //CurrentPanel.set_zoomCoefficient(CurrentPanel.get_zoomCoefficient() / 1.1);
-                    }
-                }
-
-                PrecisePoint mousePosInsideBefore = CurrentPanel.GetTranslator().TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
-
-                CurrentPanel.setZoomCoefficient(res_zoom_coef);
-
-                PrecisePoint mousePosInsideAfter = CurrentPanel.GetTranslator().TranslatePointIn(new PrecisePoint(e.getX(), e.getY()));
-
-                PrecisePoint d = new PrecisePoint(mousePosInsideBefore.getX()-mousePosInsideAfter.getX(), mousePosInsideBefore.getY()-mousePosInsideAfter.getY());
-
-                if(wheel_d < 0)
-                {
-                    CurrentPanel.MoveViewPoint(d.getX() * CurrentPanel.getZoomCoefficient(), d.getY() * CurrentPanel.getZoomCoefficient());
-                }
-
-                if(wheel_d > 0)
-                {
-                    CurrentPanel.MoveViewPoint(d.getX() * CurrentPanel.getZoomCoefficient(), d.getY() * CurrentPanel.getZoomCoefficient());
-                }
-
-                //System.out.println("zoom_lvl " + CurrentPanel.get_zoomLevel());
-                //System.out.println("zoom_coef " + CurrentPanel.get_zoomCoefficient());
-                CurrentPanel.repaint();
-            }
-        });
     }
 
 
@@ -598,14 +390,14 @@ public class MainForm extends JFrame
 
     private void Undo(ActionEvent e)
     {
-        handler.Undo();
+        CurrentPanel.getHandler().Undo();
     }
 
 
 
     private void Redo(ActionEvent e)
     {
-        handler.Redo();
+        CurrentPanel.getHandler().Redo();
     }
 
 
@@ -619,21 +411,40 @@ public class MainForm extends JFrame
 
     private void Exit(ActionEvent e)
     {
-        System.exit(0);
+        if(CurrentPanel.getHasUnsavedChanges())
+        {
+            Object[] options = {"Yes", "No"};
+            int returnVal = JOptionPane.showOptionDialog(this,
+                    "Your current project has unsaved changes that will be lost if you continue. Do you want to continue anyway?",
+                    "Warning",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE,
+                    null,
+                    options,
+                    options[1]);
+            if(returnVal == JOptionPane.YES_OPTION)
+            {
+                System.exit(0);
+            }
+        }
+        else
+        {
+            System.exit(0);
+        }
     }
 
 
 
     private void UpdateUI()
     {
-        ActionInfo info = handler.GetLastAction();
+        ActionInfo info = CurrentPanel.getHandler().GetLastAction();
         UndoMenuItem.setEnabled(info != null);
         if (info != null)
             UndoMenuItem.setText("Undo " + info.GetAction().GetName());
         else
             UndoMenuItem.setText("Undo");
 
-        info = handler.GetLastUndo();
+        info = CurrentPanel.getHandler().GetLastUndo();
         RedoMenuItem.setEnabled(info != null);
         if (info != null)
             RedoMenuItem.setText("Redo " + info.GetAction().GetName());
@@ -647,9 +458,8 @@ public class MainForm extends JFrame
 
     public void Show()
     {
-        handler = new ActionHandler();
-        InitHandler();
-
+        //CurrentPanel.getHandler() = new ActionHandler();
+        //InitHandler();
 
         UpdateUI();
 
