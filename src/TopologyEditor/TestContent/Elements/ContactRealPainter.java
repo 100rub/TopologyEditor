@@ -43,7 +43,7 @@ public class ContactRealPainter implements IPainter
         PrecisePoint pos = element.getPosition();
         double x = pos.getX();
         double y = pos.getY();
-        double size = ((Contact)element).getSize();
+        double size = ((Contact)element).getSize() / 2;
 
         return  x + size > leftTop.getX() &&
                 x - size < rightBottom.getX() &&
@@ -61,7 +61,7 @@ public class ContactRealPainter implements IPainter
         PrecisePoint pos = element.getPosition();
         double x = pos.getX();
         double y = pos.getY();
-        double size = ((Contact)element).getSize();
+        double size = ((Contact)element).getSize() / 2;
 
         return  x - size > leftTop.getX() &&
                 x + size < rightBottom.getX() &&

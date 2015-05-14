@@ -54,9 +54,9 @@ public class ContactPainter implements IPainter
         PrecisePoint pos = element.getPosition();
         double x = pos.getX() - point.getX();
         double y = pos.getY() - point.getY();
-        double size = ((Contact)element).getSize();
+        double size = ((Contact)element).getSize() / 2;
 
-        return  x*x + y*y <= size*size/4;
+        return  x*x + y*y <= size*size;
     }
 
     public boolean IsSelected(Element element, PrecisePoint leftTop, PrecisePoint rightBottom)
@@ -64,7 +64,7 @@ public class ContactPainter implements IPainter
         PrecisePoint pos = element.getPosition();
         double x = pos.getX();
         double y = pos.getY();
-        double size = ((Contact)element).getSize();
+        double size = ((Contact)element).getSize() / 2;
 
         return  x - size > leftTop.getX() &&
                 x + size < rightBottom.getX() &&
